@@ -1,0 +1,24 @@
+{
+  "build": [
+    "UILBase",
+    "UILItem",
+    "UILStorage",
+    "UILFile",
+    "InputUIL",
+    "InputUILConfig",
+    "MeshUIL",
+    "MeshUILGroup",
+    "PhysicsUIL",
+    "PhysicsUILGroup",
+    "ShaderUIL",
+    "ShaderUILGroup",
+    "TimelineUIL",
+    "TimelineUILConfig",
+    "TweenUIL",
+    "TweenUILConfig",
+    "LightUILGroup"
+  ],
+  "modules": [
+    "firebase-db"
+  ]  
+}

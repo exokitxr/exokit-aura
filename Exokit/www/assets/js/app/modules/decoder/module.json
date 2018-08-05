@@ -1,0 +1,6 @@
+{
+  "build": [
+    "ImageDecoder",
+    "ImageDecoderThread"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "modules": [
+
+  ],
+
+  "gl": [
+    "gltext-gl"
+  ],
+
+  "build": [
+    "TextGeometry"
+  ]
+}
