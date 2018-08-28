@@ -1,0 +1,14 @@
+{
+  "modules": [
+    "gltext"
+  ],
+
+  "gl": [
+    "screenquad",
+    "glui-gl"
+  ],
+
+  "build": [
+    "glui"
+  ]
+}
