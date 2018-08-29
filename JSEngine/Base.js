@@ -1,4 +1,5 @@
 window = this;
+global = this;
 
 window.screen = {};
 window.EXOKIT = {};

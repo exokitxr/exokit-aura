@@ -38,12 +38,15 @@ class JSCEngine {
             print(string);
         }
         context.setObject(unsafeBitCast(log, to: AnyObject.self), forKeyedSubscript: "print" as NSString)
-        
-        context.globalObject.setObject(FetchRequest.self, forKeyedSubscript: "FetchRequest" as NSString)
+
+        context.globalObject.setObject(NodeOSBacking.self, forKeyedSubscript: "NodeOSBacking" as NSString)
+        context.globalObject.setObject(NodeFSBacking.self, forKeyedSubscript: "NodeFSBacking" as NSString)
+        context.globalObject.setObject(RequireBacking.self, forKeyedSubscript: "RequireBacking" as NSString)
+//        context.globalObject.setObject(FetchRequest.self, forKeyedSubscript: "FetchRequest" as NSString)
 //        context.globalObject.setObject(ARInterface.self, forKeyedSubscript: "ARInterface" as NSString)
-        context.globalObject.setObject(VideoElementBacking.self, forKeyedSubscript: "VideoElementBacking" as NSString)
+//        context.globalObject.setObject(VideoElementBacking.self, forKeyedSubscript: "VideoElementBacking" as NSString)
 //        context.globalObject.setObject(WorkerBacking.self, forKeyedSubscript: "WorkerBacking" as NSString)
-        context.globalObject.setValue(UIScreen.main.nativeScale, forProperty: "devicePixelRatio");
+//        context.globalObject.setValue(UIScreen.main.nativeScale, forProperty: "devicePixelRatio");
     }
     
     fileprivate func initEngine() {

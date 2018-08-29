@@ -1,4 +1,5 @@
 window = this;
+global = this;
 
 window.screen = {};
 window.EXOKIT = {};
@@ -584,4 +585,15 @@ EXOKIT.receiveTransfer = function(key, array) {
     let type = key.split('_')[1].split('/')[0];
     Worker.TRANSFERS[key] = new window[type](array);
 };
+
+(function() {
+    let cache = {};
+    // let
+
+    global.require = function(key) {
+        if (cache[key]) return cache[key];
+        let code = RequireBacking.find(key);
+    }
+
+})();
 
