@@ -1,5 +1,5 @@
 print("require module2.js");
-var m2 = require("./module2.js");
+var m2 = require("./module2");
 
 print("module.js contents");
 

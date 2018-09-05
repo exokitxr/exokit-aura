@@ -178,5 +178,4 @@ class Require {
         
         return ret
     }
-    
 }

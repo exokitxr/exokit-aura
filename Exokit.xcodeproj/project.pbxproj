@@ -17,7 +17,6 @@
 		621402522116A9C400C8BB32 /* Exokit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 621402512116A9C400C8BB32 /* Exokit.swift */; };
 		621402552116A9FD00C8BB32 /* JSCEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 621402542116A9FD00C8BB32 /* JSCEngine.swift */; };
 		621402582116AB6800C8BB32 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 621402572116AB6800C8BB32 /* Utils.swift */; };
-		6214025B2116B13100C8BB32 /* www in Resources */ = {isa = PBXBuildFile; fileRef = 6214025A2116B13100C8BB32 /* www */; };
 		621402602116B74300C8BB32 /* engine.js in Resources */ = {isa = PBXBuildFile; fileRef = 6214025F2116B74300C8BB32 /* engine.js */; };
 		621402632116B7D100C8BB32 /* FetchRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 621402622116B7D100C8BB32 /* FetchRequest.swift */; };
 		621402652116B86C00C8BB32 /* VideoElementBacking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 621402642116B86C00C8BB32 /* VideoElementBacking.swift */; };
@@ -34,6 +33,7 @@
 		6260E7C92136612B007A7DDE /* NodeFSBacking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6260E7C82136612B007A7DDE /* NodeFSBacking.swift */; };
 		96A5381A21403D8100A55947 /* Require.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A5381921403D8100A55947 /* Require.swift */; };
 		96A5381C2140530900A55947 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A5381B2140530900A55947 /* String+Extension.swift */; };
+		96A5381D2140946C00A55947 /* www in Resources */ = {isa = PBXBuildFile; fileRef = 6214025A2116B13100C8BB32 /* www */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -353,8 +353,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6214025B2116B13100C8BB32 /* www in Resources */,
 				621402602116B74300C8BB32 /* engine.js in Resources */,
+				96A5381D2140946C00A55947 /* www in Resources */,
 				6214022D2116A84800C8BB32 /* LaunchScreen.storyboard in Resources */,
 				6214022A2116A84800C8BB32 /* Assets.xcassets in Resources */,
 				621402282116A84700C8BB32 /* Main.storyboard in Resources */,
