@@ -17,3 +17,9 @@ var m3= require("mod");
 // must show the same message as before.
 // modules are cached.
 m2.fnabcd();
+
+var sum = require("./a");
+var mul = require("./a/b");
+
+print( sum.b(9) );
+print( mul.b(9) );
