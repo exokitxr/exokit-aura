@@ -55,23 +55,6 @@ class JSCEngine {
         }
         context.setObject(unsafeBitCast(requireCallback, to: AnyObject.self), forKeyedSubscript: "require" as NSString)
         
-//        // generate a module, and module.export objects.
-//        // the hard way. Could also evalute javascript of the form: global.module={ export: {} };
-//        let module = JSObjectMake(context.jsGlobalContextRef!, nil, nil)
-//        JSValueProtect(context.jsGlobalContextRef, module)
-//
-//        let exports = JSObjectMake(context.jsGlobalContextRef!, nil, nil)
-//        JSValueProtect(context.jsGlobalContextRef, exports)
-//
-//        let vmodule = JSValue( jsValueRef: module, in: context)
-//        vmodule?.setObject(exports, forKeyedSubscript: "exports" as NSString)
-//
-////        let exportsJSString = JSStringCreateWithUTF8CString("exports")
-////        JSObjectSetProperty( context.jsGlobalContextRef!, module, exportsJSString, exports, JSPropertyAttributes(kJSPropertyAttributeNone), nil)
-////        JSStringRelease(exportsJSString);
-//
-//        context.setObject(module, forKeyedSubscript: "module" as NSString)
-        
         requireUtil = Require()
     }
     
