@@ -10,6 +10,8 @@ class JSCEngine {
     
     fileprivate var _initTime = DispatchTime.now().uptimeNanoseconds;
     
+    fileprivate var requireUtil : Require? = nil
+    
     init() {
         context = JSContext()
         context.exceptionHandler = { context, exception in
@@ -39,14 +41,38 @@ class JSCEngine {
         }
         context.setObject(unsafeBitCast(log, to: AnyObject.self), forKeyedSubscript: "print" as NSString)
 
-        context.globalObject.setObject(NodeOSBacking.self, forKeyedSubscript: "NodeOSBacking" as NSString)
-        context.globalObject.setObject(NodeFSBacking.self, forKeyedSubscript: "NodeFSBacking" as NSString)
-        context.globalObject.setObject(RequireBacking.self, forKeyedSubscript: "RequireBacking" as NSString)
+        context.setObject(NodeOSBacking.self, forKeyedSubscript: "NodeOSBacking" as NSString)
+        context.setObject(NodeFSBacking.self, forKeyedSubscript: "NodeFSBacking" as NSString)
+        context.setObject(RequireBacking.self, forKeyedSubscript: "RequireBacking" as NSString)
 //        context.globalObject.setObject(FetchRequest.self, forKeyedSubscript: "FetchRequest" as NSString)
 //        context.globalObject.setObject(ARInterface.self, forKeyedSubscript: "ARInterface" as NSString)
 //        context.globalObject.setObject(VideoElementBacking.self, forKeyedSubscript: "VideoElementBacking" as NSString)
 //        context.globalObject.setObject(WorkerBacking.self, forKeyedSubscript: "WorkerBacking" as NSString)
 //        context.globalObject.setValue(UIScreen.main.nativeScale, forProperty: "devicePixelRatio");
+        
+        let requireCallback: @convention(block) (String) -> AnyObject = { input in
+            return self.requireUtil!.require(uri: input)
+        }
+        context.setObject(unsafeBitCast(requireCallback, to: AnyObject.self), forKeyedSubscript: "require" as NSString)
+        
+//        // generate a module, and module.export objects.
+//        // the hard way. Could also evalute javascript of the form: global.module={ export: {} };
+//        let module = JSObjectMake(context.jsGlobalContextRef!, nil, nil)
+//        JSValueProtect(context.jsGlobalContextRef, module)
+//
+//        let exports = JSObjectMake(context.jsGlobalContextRef!, nil, nil)
+//        JSValueProtect(context.jsGlobalContextRef, exports)
+//
+//        let vmodule = JSValue( jsValueRef: module, in: context)
+//        vmodule?.setObject(exports, forKeyedSubscript: "exports" as NSString)
+//
+////        let exportsJSString = JSStringCreateWithUTF8CString("exports")
+////        JSObjectSetProperty( context.jsGlobalContextRef!, module, exportsJSString, exports, JSPropertyAttributes(kJSPropertyAttributeNone), nil)
+////        JSStringRelease(exportsJSString);
+//
+//        context.setObject(module, forKeyedSubscript: "module" as NSString)
+        
+        requireUtil = Require()
     }
     
     fileprivate func initEngine() {
