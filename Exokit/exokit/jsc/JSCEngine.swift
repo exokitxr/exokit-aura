@@ -49,7 +49,7 @@ class JSCEngine {
 //        context.globalObject.setObject(VideoElementBacking.self, forKeyedSubscript: "VideoElementBacking" as NSString)
 //        context.globalObject.setObject(WorkerBacking.self, forKeyedSubscript: "WorkerBacking" as NSString)
 //        context.globalObject.setValue(UIScreen.main.nativeScale, forProperty: "devicePixelRatio");
-        
+
         let requireCallback: @convention(block) (String) -> AnyObject = { input in
             return self.requireUtil!.require(uri: input)
         }

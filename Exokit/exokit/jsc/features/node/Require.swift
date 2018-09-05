@@ -120,6 +120,14 @@ class Require {
         requireStack.append(pathResolver.getBasePath())
     }
     
+    deinit {
+        if let context = JSContext.current() {
+            for (_, v) in modules {
+                JSValueUnprotect(context.jsGlobalContextRef, v.jsValueRef)
+            }
+        }
+    }
+    
     func currentRequireContext() -> String? {
         guard requireStack.count>0 else {
             return nil
