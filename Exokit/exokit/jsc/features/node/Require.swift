@@ -81,19 +81,19 @@ class BundleResolver : URIResolver {
     }
     
     // get a module contents.
-    // the module checks for:
-    //  + path
-    //  + path + ".js"
-    //  + path + "/index.js"
+    // the module checks for files and directories.
     internal func resolveModuleFileAt(path: String) -> String? {
         
         if existsFileAt(path: path) {
+            // solve as file
             return path
         } else if existsFileAt(path: "\(path).js") {
+            // solve as file
             return "\(path).js"
         } else if existsFileAt(path: "\(path)/index.js") {
+            // solve as directory
             return "\(path)/index.js"
-        }
+        } // else check for package.json
         
         return nil
     }
@@ -164,6 +164,8 @@ class Require {
         let sdirname = paths!.joined(separator: "/")
         requireStack.append(sdirname)
         
+        // returned module value.
+        // what the cached module will be.
         var ret : JSValue! = JSValue(nullIn: JSContext.current())
         
         // load module file.
