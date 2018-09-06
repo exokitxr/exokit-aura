@@ -159,9 +159,10 @@ class Require {
         }
         
         // set require context for next require
-        var paths = resolvedModuleFile?.split(separator: "/")
-        _ = paths!.popLast()
-        requireStack.append(paths!.joined(separator: "/"))
+        var paths = resolvedModuleFile?.components(separatedBy: "/")
+        let sfilename = paths!.popLast()
+        let sdirname = paths!.joined(separator: "/")
+        requireStack.append(sdirname)
         
         var ret : JSValue! = JSValue(nullIn: JSContext.current())
         
@@ -169,13 +170,23 @@ class Require {
         if let context = JSContext.current() {
             if let fileContents = try? String(contentsOfFile: resolvedModuleFile!, encoding: String.Encoding.utf8) {
 
+                // lazy way of creating module and module.export objects in main context.
                 context.evaluateScript("var module= { exports: {} };")
+
+                // set temporary dirname and filename
+                context.setObject(sdirname, forKeyedSubscript: "__dirname" as NSString)
+                context.setObject(sfilename, forKeyedSubscript: "__filename" as NSString)
                 
-                // solve cyclic refs
+                // solve cyclic refs by setting a temporarily module.exports object as module contents.
+                // cyclic refs don't export symbols as expected if `exports` object is redefined, e.g. exports = {}
                 let cyclicRef = context.objectForKeyedSubscript("module").objectForKeyedSubscript("exports")
                 modules.updateValue(cyclicRef!, forKey: resolvedModuleFile!)
                 
-                let moduleContents = "(function(module, exports) {\(fileContents);\nreturn exports || module.exports;\n}).call(this, module, module.exports);\n"
+                // wrap file contents in module call
+                let moduleContents = "(function(module, exports, __filename, __dirname) { \"use strict\"; \(fileContents);\nreturn exports || module.exports;\n}).call(this, module, module.exports, __filename, __dirname);\n"
+                
+                // set module contents to actual module evaluated return value.
+                // protect in from GC as well.
                 let retValue = context.evaluateScript(moduleContents)
                 JSValueProtect(context.jsGlobalContextRef, retValue?.jsValueRef)
                 modules.updateValue(retValue!, forKey: resolvedModuleFile!)

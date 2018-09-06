@@ -16,3 +16,13 @@ exports= {
         print("fn from module");
     }
 };
+
+print("------- global enumeration ------");
+for( var i in this ) {
+    print(i);
+}
+print("-------");
+
+
+print(__dirname)
+print(__filename)
