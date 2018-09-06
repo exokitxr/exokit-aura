@@ -23,3 +23,7 @@ var mul = require("./a/b");
 
 print( sum.b(9) );
 print( mul.b(9) );
+
+
+var cycle = require("./cycle1");
+cycle.cycle_fn();

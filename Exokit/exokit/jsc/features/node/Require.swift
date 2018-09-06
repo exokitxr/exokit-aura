@@ -121,8 +121,9 @@ class Require {
     }
     
     deinit {
+        // un protect all module objects.
         if let context = JSContext.current() {
-            for (_, v) in modules {
+            for v in modules.values {
                 JSValueUnprotect(context.jsGlobalContextRef, v.jsValueRef)
             }
         }
@@ -169,14 +170,17 @@ class Require {
             if let fileContents = try? String(contentsOfFile: resolvedModuleFile!, encoding: String.Encoding.utf8) {
 
                 context.evaluateScript("var module= { exports: {} };")
-                let moduleJSObject = context.objectForKeyedSubscript("module")!
-                JSValueProtect(context.jsGlobalContextRef, moduleJSObject.jsValueRef)
-                modules.updateValue(moduleJSObject, forKey: resolvedModuleFile!)
-
-                let moduleContents = "(function(module, exports) {\(fileContents);\nreturn module.exports || exports;\n}).call(this, module, module.exports);\n"
-                context.evaluateScript(moduleContents)
                 
-                ret = moduleJSObject.objectForKeyedSubscript("exports")
+                // solve cyclic refs
+                let cyclicRef = context.objectForKeyedSubscript("module").objectForKeyedSubscript("exports")
+                modules.updateValue(cyclicRef!, forKey: resolvedModuleFile!)
+                
+                let moduleContents = "(function(module, exports) {\(fileContents);\nreturn exports || module.exports;\n}).call(this, module, module.exports);\n"
+                let retValue = context.evaluateScript(moduleContents)
+                JSValueProtect(context.jsGlobalContextRef, retValue?.jsValueRef)
+                modules.updateValue(retValue!, forKey: resolvedModuleFile!)
+
+                ret = retValue
             }
         } else {
             print("module \(uri) does not exist.")

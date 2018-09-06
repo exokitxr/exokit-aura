@@ -51,7 +51,13 @@ class JSCEngine {
 //        context.globalObject.setValue(UIScreen.main.nativeScale, forProperty: "devicePixelRatio");
 
         let requireCallback: @convention(block) (String) -> AnyObject = { input in
-            return self.requireUtil!.require(uri: input)
+            if let requiredModule = self.requireUtil {
+                if let ret = requiredModule.require(uri: input) {
+                    return ret
+                }
+            }
+            
+            return JSValue(undefinedIn: self.context)
         }
         context.setObject(unsafeBitCast(requireCallback, to: AnyObject.self), forKeyedSubscript: "require" as NSString)
         

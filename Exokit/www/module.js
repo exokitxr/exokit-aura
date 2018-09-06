@@ -9,8 +9,10 @@ for( var i in m2 ) {
 }
 print("-------");
 
-
-exports.fn=function() {
+// redeclare exports. must work.
+exports= {
+    fn :function() {
         m2.fn();
         print("fn from module");
+    }
 };
