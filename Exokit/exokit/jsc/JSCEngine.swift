@@ -29,6 +29,18 @@ class JSCEngine {
         
         preInit();
         initEngine();
+        
+        // launch exokitjs main file. filthy stuff,
+        
+        // tell require, to resolve files from exokitjs/core folder
+        requireUtil?.setResolve(resource: "exokitjs/core", ofType: "")
+        let exokitjsCorePath = requireUtil?.currentRequireContext() ?? ""
+        if let jstxt = try? String(contentsOfFile: "\(exokitjsCorePath)/index.js") {
+            context.evaluateScript(jstxt)
+        }
+        
+        // tell require, to resolve files from www folder
+        requireUtil?.setResolve(resource: "www", ofType: "")
         context.evaluateScript(Utils.loadJS(name: "index.js"))
         cleanup();
         

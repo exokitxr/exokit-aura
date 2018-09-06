@@ -31,9 +31,10 @@
 		6260E7C421365886007A7DDE /* RequireBacking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6260E7C321365886007A7DDE /* RequireBacking.swift */; };
 		6260E7C721365CCD007A7DDE /* NodeOSBacking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6260E7C621365CCD007A7DDE /* NodeOSBacking.swift */; };
 		6260E7C92136612B007A7DDE /* NodeFSBacking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6260E7C82136612B007A7DDE /* NodeFSBacking.swift */; };
+		965460A42141CEC100B2CFF1 /* www in Resources */ = {isa = PBXBuildFile; fileRef = 965460A22141CEC100B2CFF1 /* www */; };
+		965460A52141CEC100B2CFF1 /* exokitjs in Resources */ = {isa = PBXBuildFile; fileRef = 965460A32141CEC100B2CFF1 /* exokitjs */; };
 		96A5381A21403D8100A55947 /* Require.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A5381921403D8100A55947 /* Require.swift */; };
 		96A5381C2140530900A55947 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A5381B2140530900A55947 /* String+Extension.swift */; };
-		96A72EE22140992A0002CA12 /* www in Resources */ = {isa = PBXBuildFile; fileRef = 6214025A2116B13100C8BB32 /* www */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -70,7 +71,6 @@
 		621402512116A9C400C8BB32 /* Exokit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exokit.swift; sourceTree = "<group>"; };
 		621402542116A9FD00C8BB32 /* JSCEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSCEngine.swift; sourceTree = "<group>"; };
 		621402572116AB6800C8BB32 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
-		6214025A2116B13100C8BB32 /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; name = www; path = Exokit/www; sourceTree = "<group>"; };
 		6214025F2116B74300C8BB32 /* engine.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = engine.js; sourceTree = "<group>"; };
 		621402622116B7D100C8BB32 /* FetchRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchRequest.swift; sourceTree = "<group>"; };
 		621402642116B86C00C8BB32 /* VideoElementBacking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoElementBacking.swift; sourceTree = "<group>"; };
@@ -85,6 +85,8 @@
 		6260E7C321365886007A7DDE /* RequireBacking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequireBacking.swift; sourceTree = "<group>"; };
 		6260E7C621365CCD007A7DDE /* NodeOSBacking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeOSBacking.swift; sourceTree = "<group>"; };
 		6260E7C82136612B007A7DDE /* NodeFSBacking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeFSBacking.swift; sourceTree = "<group>"; };
+		965460A22141CEC100B2CFF1 /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; name = www; path = Exokit/www; sourceTree = "<group>"; };
+		965460A32141CEC100B2CFF1 /* exokitjs */ = {isa = PBXFileReference; lastKnownFileType = folder; name = exokitjs; path = Exokit/exokitjs; sourceTree = "<group>"; };
 		96A5381921403D8100A55947 /* Require.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Require.swift; sourceTree = "<group>"; };
 		96A5381B2140530900A55947 /* String+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -117,7 +119,8 @@
 		621402162116A84600C8BB32 = {
 			isa = PBXGroup;
 			children = (
-				6214025A2116B13100C8BB32 /* www */,
+				965460A32141CEC100B2CFF1 /* exokitjs */,
+				965460A22141CEC100B2CFF1 /* www */,
 				621402212116A84600C8BB32 /* Exokit */,
 				621402362116A84800C8BB32 /* ExokitTests */,
 				621402412116A84800C8BB32 /* ExokitUITests */,
@@ -356,8 +359,9 @@
 				621402602116B74300C8BB32 /* engine.js in Resources */,
 				6214022D2116A84800C8BB32 /* LaunchScreen.storyboard in Resources */,
 				6214022A2116A84800C8BB32 /* Assets.xcassets in Resources */,
+				965460A42141CEC100B2CFF1 /* www in Resources */,
 				621402282116A84700C8BB32 /* Main.storyboard in Resources */,
-				96A72EE22140992A0002CA12 /* www in Resources */,
+				965460A52141CEC100B2CFF1 /* exokitjs in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -700,7 +704,7 @@
 				621402462116A84800C8BB32 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		621402472116A84800C8BB32 /* Build configuration list for PBXNativeTarget "Exokit" */ = {
 			isa = XCConfigurationList;
@@ -709,7 +713,7 @@
 				621402492116A84800C8BB32 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		6214024A2116A84800C8BB32 /* Build configuration list for PBXNativeTarget "ExokitTests" */ = {
 			isa = XCConfigurationList;
@@ -718,7 +722,7 @@
 				6214024C2116A84800C8BB32 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		6214024D2116A84800C8BB32 /* Build configuration list for PBXNativeTarget "ExokitUITests" */ = {
 			isa = XCConfigurationList;
@@ -727,7 +731,7 @@
 				6214024F2116A84800C8BB32 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 	};

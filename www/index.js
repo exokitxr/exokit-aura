@@ -1,6 +1,3 @@
-const core = require("module1");
-print("from exokit core: "+core.exokit.module1(2));
-
 print("require module.js");
 const m= require("./module.js");
 const m2= require("mod");

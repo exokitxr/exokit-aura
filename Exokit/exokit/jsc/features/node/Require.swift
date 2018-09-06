@@ -13,7 +13,7 @@ import JavaScriptCore
 // e.g. solve differences between http:// isDirectory, or file:// isDirectory
 protocol URIResolver {
     
-    func getBasePath() -> String;
+    func getBasePath(resource: String, ofType: String) -> String;
     func resolve(path: String, file: String) -> String?;
     func sanitize(path: String, file: String) -> String?;
     func existsFileAt(path: String) -> Bool;
@@ -28,17 +28,35 @@ protocol URIResolver {
 class BundleResolver : URIResolver {
     
     func resolve(path: String, file: String) -> String? {
-        if let path = sanitize(path: path, file: file) {
-            if let resolvedModuleFile = resolveModuleFileAt(path: path) {
-                return resolvedModuleFile
+        
+        if isLocalModule(file) {
+            if let path = sanitize(path: path, file: file) {
+                if let resolvedModuleFile = resolveModuleFileAt(path: path) {
+                    return resolvedModuleFile
+                }
+            }
+        } else {
+            // bundle folder
+            let bundlePath = Bundle.main.bundlePath
+            
+            // modules search path precedence.
+            let modulesPath = [
+                "\(bundlePath)/exokitjs/node_modules/\(file)",
+                "\(bundlePath)/www/node_modules/\(file)"
+            ]
+            
+            for modulePath in modulesPath {
+                if let resolvedModuleFile = resolveModuleFileAt(path: modulePath) {
+                    return resolvedModuleFile
+                }
             }
         }
         
         return nil
     }
     
-    func getBasePath() -> String {
-        if let path = Bundle.main.path(forResource: "www", ofType: "") {
+    func getBasePath(resource: String = "www", ofType: String = "") -> String {
+        if let path = Bundle.main.path(forResource: resource, ofType: ofType) {
             return path;
         } else {
             let documentDirectoryURL =  try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
@@ -46,32 +64,30 @@ class BundleResolver : URIResolver {
         }
     }
     
+    fileprivate func isLocalModule(_ filePath: String) -> Bool {
+        return filePath[0..<3]=="../" || filePath[0..<2]=="./"
+    }
+    
     // sanitize paths like ./././abcd/ef/gh/../../../a -> a
     func sanitize(path: String, file: String) -> String? {
 
-        // local modules.
-        if file[0..<3]=="../" || file[0..<2]=="./" {
-
-            let str = "\(path)/\(file)"
-            let entries = str.split(separator: "/")
-            
-            var sanitized = [String]()
-            for entry in entries {
-                if entry==".." {
-                    guard sanitized.count == 0 else {
-                        print("sanitize path \(str) underflow")
-                        return nil
-                    }
-                    _ = sanitized.popLast()
-                } else if entry != "." {
-                    sanitized.append(String(entry))
+        let str = "\(path)/\(file)"
+        let entries = str.split(separator: "/")
+        
+        var sanitized = [String]()
+        for entry in entries {
+            if entry==".." {
+                guard sanitized.count == 0 else {
+                    print("sanitize path \(str) underflow")
+                    return nil
                 }
+                _ = sanitized.popLast()
+            } else if entry != "." {
+                sanitized.append(String(entry))
             }
-            
-            return sanitized.joined(separator: "/")
         }
         
-        return "\(path)/node_modules/\(file)"
+        return sanitized.joined(separator: "/")
     }
     
     internal func existsFileAt(path: String) -> Bool {
@@ -117,7 +133,7 @@ class Require {
     
     init() {
         // BUGBUG later on must be refactored to accomodate the protocol used to load the main js file.
-        requireStack.append(pathResolver.getBasePath())
+        requireStack.append(pathResolver.getBasePath(resource: "www", ofType: ""))
     }
     
     deinit {
@@ -127,6 +143,11 @@ class Require {
                 JSValueUnprotect(context.jsGlobalContextRef, v.jsValueRef)
             }
         }
+    }
+    
+    func setResolve( resource: String, ofType: String) {
+        requireStack.removeAll()
+        requireStack.append(pathResolver.getBasePath(resource: resource, ofType: ofType))
     }
     
     func currentRequireContext() -> String? {
