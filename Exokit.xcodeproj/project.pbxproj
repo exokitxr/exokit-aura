@@ -17,7 +17,6 @@
 		621402522116A9C400C8BB32 /* Exokit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 621402512116A9C400C8BB32 /* Exokit.swift */; };
 		621402552116A9FD00C8BB32 /* JSCEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 621402542116A9FD00C8BB32 /* JSCEngine.swift */; };
 		621402582116AB6800C8BB32 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 621402572116AB6800C8BB32 /* Utils.swift */; };
-		6214025B2116B13100C8BB32 /* www in Resources */ = {isa = PBXBuildFile; fileRef = 6214025A2116B13100C8BB32 /* www */; };
 		621402602116B74300C8BB32 /* engine.js in Resources */ = {isa = PBXBuildFile; fileRef = 6214025F2116B74300C8BB32 /* engine.js */; };
 		621402632116B7D100C8BB32 /* FetchRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 621402622116B7D100C8BB32 /* FetchRequest.swift */; };
 		621402652116B86C00C8BB32 /* VideoElementBacking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 621402642116B86C00C8BB32 /* VideoElementBacking.swift */; };
@@ -32,6 +31,9 @@
 		6260E7C421365886007A7DDE /* RequireBacking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6260E7C321365886007A7DDE /* RequireBacking.swift */; };
 		6260E7C721365CCD007A7DDE /* NodeOSBacking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6260E7C621365CCD007A7DDE /* NodeOSBacking.swift */; };
 		6260E7C92136612B007A7DDE /* NodeFSBacking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6260E7C82136612B007A7DDE /* NodeFSBacking.swift */; };
+		96A5381A21403D8100A55947 /* Require.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A5381921403D8100A55947 /* Require.swift */; };
+		96A5381C2140530900A55947 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A5381B2140530900A55947 /* String+Extension.swift */; };
+		96A72EE22140992A0002CA12 /* www in Resources */ = {isa = PBXBuildFile; fileRef = 6214025A2116B13100C8BB32 /* www */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -83,6 +85,8 @@
 		6260E7C321365886007A7DDE /* RequireBacking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequireBacking.swift; sourceTree = "<group>"; };
 		6260E7C621365CCD007A7DDE /* NodeOSBacking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeOSBacking.swift; sourceTree = "<group>"; };
 		6260E7C82136612B007A7DDE /* NodeFSBacking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeFSBacking.swift; sourceTree = "<group>"; };
+		96A5381921403D8100A55947 /* Require.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Require.swift; sourceTree = "<group>"; };
+		96A5381B2140530900A55947 /* String+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -239,6 +243,8 @@
 			children = (
 				6260E7C621365CCD007A7DDE /* NodeOSBacking.swift */,
 				6260E7C82136612B007A7DDE /* NodeFSBacking.swift */,
+				96A5381921403D8100A55947 /* Require.swift */,
+				96A5381B2140530900A55947 /* String+Extension.swift */,
 			);
 			path = node;
 			sourceTree = "<group>";
@@ -347,11 +353,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6214025B2116B13100C8BB32 /* www in Resources */,
 				621402602116B74300C8BB32 /* engine.js in Resources */,
 				6214022D2116A84800C8BB32 /* LaunchScreen.storyboard in Resources */,
 				6214022A2116A84800C8BB32 /* Assets.xcassets in Resources */,
 				621402282116A84700C8BB32 /* Main.storyboard in Resources */,
+				96A72EE22140992A0002CA12 /* www in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -379,12 +385,14 @@
 				621402632116B7D100C8BB32 /* FetchRequest.swift in Sources */,
 				621402582116AB6800C8BB32 /* Utils.swift in Sources */,
 				62142026211773350082A1DB /* ARInterface.swift in Sources */,
+				96A5381C2140530900A55947 /* String+Extension.swift in Sources */,
 				6260E7C421365886007A7DDE /* RequireBacking.swift in Sources */,
 				621402552116A9FD00C8BB32 /* JSCEngine.swift in Sources */,
 				6214026E2116BBB500C8BB32 /* BufferData.m in Sources */,
 				6214026F2116BBC200C8BB32 /* BufferData.h in Sources */,
 				6260E7C92136612B007A7DDE /* NodeFSBacking.swift in Sources */,
 				621402252116A84700C8BB32 /* ViewController.swift in Sources */,
+				96A5381A21403D8100A55947 /* Require.swift in Sources */,
 				621420292117744C0082A1DB /* ARTracking.swift in Sources */,
 				6214202B211776C30082A1DB /* AR.swift in Sources */,
 				6214026A2116B9D500C8BB32 /* GLPropertyBindings.swift in Sources */,
@@ -567,7 +575,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = V9XRSNSDY5;
+				DEVELOPMENT_TEAM = 6KY6PVRG9Z;
 				INFOPLIST_FILE = Exokit/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -586,7 +594,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = V9XRSNSDY5;
+				DEVELOPMENT_TEAM = 6KY6PVRG9Z;
 				INFOPLIST_FILE = Exokit/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

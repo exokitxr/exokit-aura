@@ -14,6 +14,12 @@ class Exokit {
     static var gl: GLSurface!
     static var inst: Exokit!
     
+    /*
+     modules contains a dictionary with resolved and loaded modules.
+     will host JSValueProtected export module objects.
+     */
+    var modules = [String:JSValue]()
+    
     init() {
         Exokit.engine = JSCEngine()
         Exokit.gl = GLSurface()
