@@ -51,7 +51,7 @@ class JSCEngine {
         let log: @convention(block) (String) -> Void = { string in
             print(string);
         }
-        context.setObject(unsafeBitCast(log, to: AnyObject.self), forKeyedSubscript: "print" as NSString)
+        context.setObject( unsafeBitCast(log, to: AnyObject.self), forKeyedSubscript: "print" as NSString)
 
         context.setObject(NodeOSBacking.self, forKeyedSubscript: "NodeOSBacking" as NSString)
         context.setObject(NodeFSBacking.self, forKeyedSubscript: "NodeFSBacking" as NSString)
@@ -72,8 +72,10 @@ class JSCEngine {
             return JSValue(undefinedIn: self.context)
         }
         context.setObject(unsafeBitCast(requireCallback, to: AnyObject.self), forKeyedSubscript: "require" as NSString)
-        
         requireUtil = Require()
+        
+        // Initialize Wrapper classes
+        FileWrapper.Initialize(context)
     }
     
     fileprivate func initEngine() {
