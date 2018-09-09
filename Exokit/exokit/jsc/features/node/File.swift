@@ -24,6 +24,7 @@ class File {
     
     init(path: String) {
         self.path_ = "\(Bundle.main.bundlePath)/\(path)"
+        print(self.path_)
         setFileInfo()
     }
     
@@ -173,7 +174,7 @@ struct FileWrapper {
                 attributes: JSPropertyAttributes(kJSPropertyAttributeDontDelete)),
             
             JSStaticValue(
-                name: ("idDirectory" as NSString).utf8String,
+                name: ("isDirectory" as NSString).utf8String,
                 getProperty: { context, object, propertyName, exception in
                     let wrappable = FileWrapper.GetWrappable(ref: object)
                     guard wrappable != nil else {

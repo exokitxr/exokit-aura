@@ -28,10 +28,10 @@
 		62142026211773350082A1DB /* ARInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62142025211773350082A1DB /* ARInterface.swift */; };
 		621420292117744C0082A1DB /* ARTracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 621420282117744C0082A1DB /* ARTracking.swift */; };
 		6214202B211776C30082A1DB /* AR.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6214202A211776C30082A1DB /* AR.swift */; };
+		6220CED02144CA8100102137 /* www in Resources */ = {isa = PBXBuildFile; fileRef = 6220CECF2144CA8100102137 /* www */; };
 		6260E7C421365886007A7DDE /* RequireBacking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6260E7C321365886007A7DDE /* RequireBacking.swift */; };
 		6260E7C721365CCD007A7DDE /* NodeOSBacking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6260E7C621365CCD007A7DDE /* NodeOSBacking.swift */; };
 		6260E7C92136612B007A7DDE /* NodeFSBacking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6260E7C82136612B007A7DDE /* NodeFSBacking.swift */; };
-		965460A42141CEC100B2CFF1 /* www in Resources */ = {isa = PBXBuildFile; fileRef = 965460A22141CEC100B2CFF1 /* www */; };
 		965460A52141CEC100B2CFF1 /* exokitjs in Resources */ = {isa = PBXBuildFile; fileRef = 965460A32141CEC100B2CFF1 /* exokitjs */; };
 		965BE2C52144228500EA4E53 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965BE2C42144228500EA4E53 /* File.swift */; };
 		965BE2C72144335100EA4E53 /* JSCUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965BE2C62144335100EA4E53 /* JSCUtils.swift */; };
@@ -85,10 +85,10 @@
 		62142025211773350082A1DB /* ARInterface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARInterface.swift; sourceTree = "<group>"; };
 		621420282117744C0082A1DB /* ARTracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARTracking.swift; sourceTree = "<group>"; };
 		6214202A211776C30082A1DB /* AR.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AR.swift; sourceTree = "<group>"; };
+		6220CECF2144CA8100102137 /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; name = www; path = Exokit/www; sourceTree = "<group>"; };
 		6260E7C321365886007A7DDE /* RequireBacking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequireBacking.swift; sourceTree = "<group>"; };
 		6260E7C621365CCD007A7DDE /* NodeOSBacking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeOSBacking.swift; sourceTree = "<group>"; };
 		6260E7C82136612B007A7DDE /* NodeFSBacking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeFSBacking.swift; sourceTree = "<group>"; };
-		965460A22141CEC100B2CFF1 /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; name = www; path = Exokit/www; sourceTree = "<group>"; };
 		965460A32141CEC100B2CFF1 /* exokitjs */ = {isa = PBXFileReference; lastKnownFileType = folder; name = exokitjs; path = Exokit/exokitjs; sourceTree = "<group>"; };
 		965BE2C42144228500EA4E53 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
 		965BE2C62144335100EA4E53 /* JSCUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSCUtils.swift; sourceTree = "<group>"; };
@@ -125,8 +125,8 @@
 		621402162116A84600C8BB32 = {
 			isa = PBXGroup;
 			children = (
+				6220CECF2144CA8100102137 /* www */,
 				965460A32141CEC100B2CFF1 /* exokitjs */,
-				965460A22141CEC100B2CFF1 /* www */,
 				621402212116A84600C8BB32 /* Exokit */,
 				621402362116A84800C8BB32 /* ExokitTests */,
 				621402412116A84800C8BB32 /* ExokitUITests */,
@@ -365,10 +365,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6220CED02144CA8100102137 /* www in Resources */,
 				621402602116B74300C8BB32 /* engine.js in Resources */,
 				6214022D2116A84800C8BB32 /* LaunchScreen.storyboard in Resources */,
 				6214022A2116A84800C8BB32 /* Assets.xcassets in Resources */,
-				965460A42141CEC100B2CFF1 /* www in Resources */,
 				621402282116A84700C8BB32 /* Main.storyboard in Resources */,
 				965460A52141CEC100B2CFF1 /* exokitjs in Resources */,
 			);
