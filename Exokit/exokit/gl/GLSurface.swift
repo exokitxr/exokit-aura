@@ -68,7 +68,6 @@ class GLSurface: GLKViewController {
         _bindTexture()
         _uniform1i()
         _pixelStorei()
-        _getExtensions()
         viewport()
         activeTexture()
         attachShader()
@@ -194,6 +193,7 @@ class GLSurface: GLKViewController {
         _bindVertexArray()
         deleteVertexArray()
         drawBuffers()
+        _getString();
     }
     
     fileprivate func _getImageDimensions() {
@@ -271,8 +271,9 @@ class GLSurface: GLKViewController {
             if (img["intArray"] != nil) {
                 let array:[Double] = [0, 0, 0, 0];
                 glTexImage2D(GLenum(target), GLint(level), GLint(intfr), GLsizei(width), GLsizei(height), GLint(border), GLenum(format), GLenum(type), array.glIntArray)
-                
-                return
+            } else if (img["floatArray"] != nil) {
+                let array = img["floatArray"]! as! NSArray;
+                glTexImage2D(GLenum(target), GLint(level), GLint(intfr), GLsizei(width), GLsizei(height), GLint(border), GLenum(format), GLenum(type), array.glFloatArray)
             }
             
             let src = img["_src"]! as! String
@@ -1283,14 +1284,6 @@ class GLSurface: GLKViewController {
         _gl.setObject(unsafeBitCast(fn, to: AnyObject.self), forKeyedSubscript: "texParameteri" as NSString)
     }
     
-    fileprivate func _getExtensions() {
-        let fn: @convention(block) () -> String = {
-            let cs = glGetString(GLenum(GL_EXTENSIONS))
-            return String(cString: cs!)
-        }
-        _gl.setObject(unsafeBitCast(fn, to: AnyObject.self), forKeyedSubscript: "_getExtensions" as NSString)
-    }
-    
     fileprivate func getAttribLocation() {
         let fn: @convention(block) (NSDictionary, String) -> Int = { program, name in
             let pid = program["_id"]! as! Int
@@ -1392,6 +1385,23 @@ class GLSurface: GLKViewController {
             glDrawBuffers(GLsizei(count), enums);
         }
         _gl.setObject(unsafeBitCast(fn, to: AnyObject.self), forKeyedSubscript: "drawBuffers" as NSString)
+    }
+    
+    fileprivate func _getString() {
+        let fn: @convention(block) (Int) -> String = { param in
+            var extensions = glGetString(GLenum(param))
+                as UnsafePointer<UInt8>
+            var array : [Int8] = []
+            
+            while (extensions[0] != UInt8(ascii:"\0")){
+                array.append(Int8(extensions[0]))
+                extensions = extensions.advanced(by: 1)
+            }
+            
+            array.append(Int8(0))
+            return String.init(cString: array)
+        }
+        _gl.setObject(unsafeBitCast(fn, to: AnyObject.self), forKeyedSubscript: "_getString" as NSString)
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
