@@ -58,15 +58,13 @@ class JSCEngine {
             print(string);
         }
         context.setObject( unsafeBitCast(log, to: AnyObject.self), forKeyedSubscript: "print" as NSString)
-
-        context.setObject(NodeOSBacking.self, forKeyedSubscript: "NodeOSBacking" as NSString)
-        context.setObject(NodeFSBacking.self, forKeyedSubscript: "NodeFSBacking" as NSString)
-        context.setObject(RequireBacking.self, forKeyedSubscript: "RequireBacking" as NSString)
+        
+        
 //        context.globalObject.setObject(FetchRequest.self, forKeyedSubscript: "FetchRequest" as NSString)
 //        context.globalObject.setObject(ARInterface.self, forKeyedSubscript: "ARInterface" as NSString)
 //        context.globalObject.setObject(VideoElementBacking.self, forKeyedSubscript: "VideoElementBacking" as NSString)
 //        context.globalObject.setObject(WorkerBacking.self, forKeyedSubscript: "WorkerBacking" as NSString)
-//        context.globalObject.setValue(UIScreen.main.nativeScale, forProperty: "devicePixelRatio");
+        context.globalObject.setValue(UIScreen.main.nativeScale, forProperty: "devicePixelRatio");
 
         let requireCallback: @convention(block) (String) -> AnyObject = { input in
             if let requiredModule = self.requireUtil {
@@ -105,6 +103,12 @@ class JSCEngine {
         }
         let exokit = context.objectForKeyedSubscript("EXOKIT");
         exokit?.setObject(unsafeBitCast(exokitImport, to: AnyObject.self), forKeyedSubscript: "import" as NSString)
+        
+        let exokitEvaluate: @convention(block) (String) -> Void = { code in
+            self.context.evaluateScript(code);
+        }
+        exokit?.setObject(unsafeBitCast(exokitEvaluate, to: AnyObject.self), forKeyedSubscript: "evaluate" as NSString)
+        exokit?.setValue(ProcessInfo.processInfo.processorCount, forProperty: "processorCount");
 
         let screen = context.objectForKeyedSubscript("screen");
         screen?.setObject(UIScreen.main.bounds.width, forKeyedSubscript: "width" as NSString)
