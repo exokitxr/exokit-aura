@@ -36,6 +36,7 @@
 		965BE2C52144228500EA4E53 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965BE2C42144228500EA4E53 /* File.swift */; };
 		965BE2C72144335100EA4E53 /* JSCUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965BE2C62144335100EA4E53 /* JSCUtils.swift */; };
 		965BE2C9214463F900EA4E53 /* UnsafeMutableRawPointer+JSGC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965BE2C8214463F900EA4E53 /* UnsafeMutableRawPointer+JSGC.swift */; };
+		965BE2CB21452D8600EA4E53 /* Wrappable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965BE2CA21452D8600EA4E53 /* Wrappable.swift */; };
 		96A5381A21403D8100A55947 /* Require.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A5381921403D8100A55947 /* Require.swift */; };
 		96A5381C2140530900A55947 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A5381B2140530900A55947 /* String+Extension.swift */; };
 /* End PBXBuildFile section */
@@ -93,6 +94,7 @@
 		965BE2C42144228500EA4E53 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
 		965BE2C62144335100EA4E53 /* JSCUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSCUtils.swift; sourceTree = "<group>"; };
 		965BE2C8214463F900EA4E53 /* UnsafeMutableRawPointer+JSGC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UnsafeMutableRawPointer+JSGC.swift"; sourceTree = "<group>"; };
+		965BE2CA21452D8600EA4E53 /* Wrappable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Wrappable.swift; sourceTree = "<group>"; };
 		96A5381921403D8100A55947 /* Require.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Require.swift; sourceTree = "<group>"; };
 		96A5381B2140530900A55947 /* String+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -257,6 +259,7 @@
 				96A5381B2140530900A55947 /* String+Extension.swift */,
 				965BE2C42144228500EA4E53 /* File.swift */,
 				965BE2C8214463F900EA4E53 /* UnsafeMutableRawPointer+JSGC.swift */,
+				965BE2CA21452D8600EA4E53 /* Wrappable.swift */,
 			);
 			path = node;
 			sourceTree = "<group>";
@@ -396,6 +399,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				621402632116B7D100C8BB32 /* FetchRequest.swift in Sources */,
+				965BE2CB21452D8600EA4E53 /* Wrappable.swift in Sources */,
 				621402582116AB6800C8BB32 /* Utils.swift in Sources */,
 				62142026211773350082A1DB /* ARInterface.swift in Sources */,
 				96A5381C2140530900A55947 /* String+Extension.swift in Sources */,

@@ -8,3 +8,7 @@
 /build
 /captures
 .externalNativeBuild
+
+Exokit.xcodeproj/project.xcworkspace
+Exokit.xcodeproj/xcuserdata
+

@@ -31,7 +31,6 @@ class JSCEngine {
         initEngine();
         
         // launch exokitjs main file. filthy stuff,
-        
         // tell require, to resolve files from exokitjs/core folder
         requireUtil?.setResolve(resource: "exokitjs/core", ofType: "")
         let exokitjsCorePath = requireUtil?.currentRequireContext() ?? ""
