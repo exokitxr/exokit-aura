@@ -27,7 +27,7 @@ Storage has 2 hardcoded values:
 + size: number. File size in bytes
 + exists: boolean
 + path: string. Full storage-resolved path.
-+ idDirectory: boolean. If exists and it is a directory.
++ isDirectory: boolean. If exists and it is a directory.
 
 ### methods
 
