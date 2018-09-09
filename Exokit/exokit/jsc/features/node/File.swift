@@ -15,6 +15,7 @@ enum FileStorage {
 }
 
 // A native File object wrapped in a JS object
+// The wrapper object if FileWrapper.
 class File : Wrappable {
 
     fileprivate var handle: Int = -1
@@ -97,13 +98,6 @@ class File : Wrappable {
     }
     
     func createWithText(_ str: String) -> Bool {
-        // same result on commented/uncommented code.
-//        let data = Data.init(bytes: Array(str.utf8))
-//        let ret = FileManager.default.createFile(atPath: path, contents: data, attributes: nil)
-//        setFileInfo()
-//        return ret
-
-        // simpler code.
         do {
             try str.write(toFile: path, atomically: false, encoding: String.Encoding.utf8)
             setFileInfo()
@@ -112,8 +106,6 @@ class File : Wrappable {
             print("unexpected File.createWithText: \(error)")
             return false
         }
-        
-        
     }
     
     func delete() -> Bool {
@@ -174,6 +166,7 @@ struct FileWrapper {
             nil);
     }
     
+    // JSFile class object contructor
     static let constructorCallback : JSObjectCallAsConstructorCallback = { context, constructor, argc, argv, exception in
         
         // check parameters. If not suitable, throw an exception.
@@ -201,6 +194,7 @@ struct FileWrapper {
         return file.associateWithWrapper(context: context!)
     }
     
+    // Javascript File properties: size, path, exists, isDirectory
     static let staticProperties = [
         
         JSStaticValue(
@@ -254,6 +248,12 @@ struct FileWrapper {
         JSStaticValue(name: nil, getProperty: nil, setProperty: nil, attributes: 0)
     ]
     
+    // Javascript File object prototype functions:
+    //   + loadAsText() -> boolean
+    //   + createWithText(text: String) -> boolean
+    //   + listFiles() -> File[]
+    //   + delete() -> boolean
+    //   + makeDirectory() -> boolean
     static let staticMethods = [
         
         JSStaticFunction(
@@ -331,32 +331,38 @@ struct FileWrapper {
         JSStaticFunction(name: nil, callAsFunction: nil, attributes: 0)
     ]
     
+    // Convert to type. I am getting the wrong type. Get 3 (number) when doing somethign like:
+    // console.log(""+file)
+    // I expect value 4.
+    static let convertToTypeCallback : JSObjectConvertToTypeCallback = { context, object, type, exception in
+        if ( type==kJSTypeString ) {
+            if let file: File = Wrappable.from(ref: object) {
+                return JSCUtils.StringToJSString("File: \(file.path)")
+            }
+        }
+        
+        return JSValueMakeNull(context)
+    }
+    
+    // Finalizer: Free the Wrappable instance.
+    static let finalizerCallback : JSObjectFinalizeCallback = { object in
+        
+        let priv = JSObjectGetPrivate(object)
+
+        // convert raw pointer to type (File.self) and release (decrement retain count)
+        let _ = priv?.releasePointer()
+    }
+    
     // Create and store the class ref.
     fileprivate static func InitializeClass() {
         
         var cd = kJSClassDefinitionEmpty
         
-        let finalizerCallback : JSObjectFinalizeCallback = { object in
-            let priv = JSObjectGetPrivate(object)
-            // convert raw pointer to type (File.self) and release (decrement retain count)
-            let _ = priv?.releasePointer()
-        }
-        
-        let convertToTypeCallback : JSObjectConvertToTypeCallback = { context, object, type, exception in
-            if ( type==kJSTypeString ) {
-                if let file: File = Wrappable.from(ref: object) {
-                    return JSCUtils.StringToJSString("File: \(file.path)")
-                }
-            }
-            
-            return JSValueMakeNull(context)
-        }
-        
         cd.className = (ClassName as NSString).utf8String
         cd.attributes = JSClassAttributes(kJSClassAttributeNone);
         cd.callAsConstructor = FileWrapper.constructorCallback
-        cd.finalize = finalizerCallback
-        cd.convertToType = convertToTypeCallback
+        cd.finalize = FileWrapper.finalizerCallback
+        cd.convertToType = FileWrapper.convertToTypeCallback
         cd.staticValues = UnsafePointer(FileWrapper.staticProperties)
         cd.staticFunctions = UnsafePointer(FileWrapper.staticMethods)
         
