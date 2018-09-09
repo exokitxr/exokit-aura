@@ -30,20 +30,27 @@ class JSCEngine {
         preInit();
         initEngine();
         
-        // launch exokitjs main file. filthy stuff,
-        // tell require, to resolve files from exokitjs/core folder
+        // execute exokitjs/core
+        bootstrapExokit()
+        // execute www folder contents.
+        runUserland()
+        
+        cleanup();
+        
+        JSCEngine.active = true
+    }
+    
+    fileprivate func bootstrapExokit() {
         requireUtil?.setResolve(resource: "exokitjs/core", ofType: "")
         let exokitjsCorePath = requireUtil?.currentRequireContext() ?? ""
         if let jstxt = try? String(contentsOfFile: "\(exokitjsCorePath)/index.js") {
             context.evaluateScript(jstxt)
         }
-        
-        // tell require, to resolve files from www folder
+    }
+    
+    fileprivate func runUserland() {
         requireUtil?.setResolve(resource: "www", ofType: "")
         context.evaluateScript(Utils.loadJS(name: "index.js"))
-        cleanup();
-        
-        JSCEngine.active = true
     }
 
     fileprivate func preInit() {
