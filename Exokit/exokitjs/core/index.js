@@ -26,3 +26,7 @@ EXOKIT.onload = function() {
 window.requestAnimationFrame = function(callback) {
     EXOKIT.animationFrame = callback;
 };
+
+const rFile = new File("https://www.duckduckgo.com",2);
+console.log( rFile.loadAsText() );
+

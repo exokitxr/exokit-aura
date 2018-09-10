@@ -12,13 +12,66 @@ import JavaScriptCore
 enum FileStorage {
     case Bundle
     case Documents
+    case Remote
 }
 
-// A native File object wrapped in a JS object
-// The wrapper object if FileWrapper.
-class File : Wrappable {
+protocol AbstractFile {
 
-    fileprivate var handle: Int = -1
+    var size: Double { get }
+    var isDirectory: Bool { get }
+    var exists: Bool {get}
+    var path: String {get}
+    
+    func loadAsText() -> String?
+    func createWithText(_ str: String) -> Bool
+    func listFiles() -> [AbstractFile]
+    func delete() -> Bool
+    func mkdir() -> Bool
+}
+
+class RemoteFile : AbstractFile {
+    
+    var size: Double = 0
+    var isDirectory: Bool = false
+    var exists: Bool = false
+    var path: String = ""
+    
+    init(path: String, storage: FileStorage = .Bundle) {
+        self.path = path
+    }
+    
+    func loadAsText() -> String? {
+        
+        do {
+            return try String(contentsOf: URL.init(string: path)!, encoding: String.Encoding.utf8)
+        }
+        catch let error {
+            print("\(error)")
+        }
+            
+        return nil
+    }
+    
+    func createWithText(_ str: String) -> Bool {
+        return false
+    }
+    
+    func listFiles() -> [AbstractFile] {
+        return []
+    }
+    
+    func delete() -> Bool {
+        return false
+    }
+    
+    func mkdir() -> Bool {
+        return false
+    }
+    
+}
+
+class LocalFile : AbstractFile {
+
     var path: String = ""
     var isDirectory: Bool = false
     var exists: Bool = false
@@ -26,14 +79,12 @@ class File : Wrappable {
     var storage : FileStorage = .Bundle
     
     init(path: String, storage: FileStorage = .Bundle) {
-        super.init()
         self.storage = storage
-        self.path = File.FilePath(path: path, storage: storage)
+        self.path = LocalFile.FilePath(path: path, storage: storage)
         setFileInfo()
     }
     
     init(wrapped: String, storage: FileStorage = .Bundle) {
-        super.init()
         self.path = wrapped
         self.storage = storage
         setFileInfo()
@@ -46,17 +97,11 @@ class File : Wrappable {
         case .Documents:
             let dir = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)[0]
             return "\(dir)/\(path)"
+        default:
+            return path
         }
     }
-    
-    override func associateWithWrapper(context: JSContextRef) -> JSValueRef {
-        return JSObjectMake(context, FileWrapper.ClassRef!, retainedPointerFor(value: self))
-    }
-    
-    func isOpen() -> Bool {
-        return handle != -1
-    }
-    
+
     // filename is searched for in the bundle directory.
     private func setFileInfo() {
         var isDir: ObjCBool = false
@@ -80,15 +125,15 @@ class File : Wrappable {
         return nil
     }
     
-    func listFiles() -> [File] {
+    func listFiles() -> [AbstractFile] {
         if !isDirectory {
             return []
         }
         
         if let filepaths = try? FileManager.default.contentsOfDirectory(atPath: path) {
-            var ret: [File] = []
+            var ret: [LocalFile] = []
             for filepath in filepaths {
-                ret.append(File(wrapped: "\(path)/\(filepath)", storage: storage))
+                ret.append(LocalFile(wrapped: "\(path)/\(filepath)", storage: storage))
             }
             
             return ret
@@ -129,6 +174,60 @@ class File : Wrappable {
             print("unexpected File.mkdir: \(error)")
             return false
         }
+    }
+}
+
+// A native File object wrapped in a JS object
+// The wrapper object if FileWrapper.
+class File : Wrappable {
+
+    var fileDelegate: AbstractFile?
+    
+    init(path: String, storage: FileStorage = .Bundle) {
+        super.init()
+        switch(storage) {
+        case .Remote:
+            fileDelegate = RemoteFile(path:path, storage: storage)
+        default:
+            fileDelegate = LocalFile(path: path, storage: storage)
+        }
+    }
+    
+    init(wrap: AbstractFile) {
+        super.init()
+        fileDelegate = wrap
+    }
+    
+    override func associateWithWrapper(context: JSContextRef) -> JSValueRef {
+        return JSObjectMake(context, FileWrapper.ClassRef!, retainedPointerFor(value: self))
+    }
+    
+    func loadAsText() -> String? {
+        return fileDelegate?.loadAsText()
+    }
+    
+    func listFiles() -> [File] {
+        
+        var ret: [File] = []
+        
+        let afiles = fileDelegate?.listFiles() ?? []
+        for file in afiles {
+            ret.append(File(wrap: file))
+        }
+        
+        return ret
+    }
+    
+    func createWithText(_ str: String) -> Bool {
+        return fileDelegate?.createWithText(str) ?? false
+    }
+    
+    func delete() -> Bool {
+        return fileDelegate?.delete() ?? false
+    }
+    
+    func mkdir() -> Bool {
+        return fileDelegate?.mkdir() ?? false
     }
 }
 
@@ -185,6 +284,10 @@ struct FileWrapper {
                 storage = FileStorage.Bundle
             } else if v==1 {
                 storage = FileStorage.Documents
+            } else if v==2 {
+                storage = FileStorage.Remote
+            } else {
+                print("Undefined storage \(storage)")
             }
         }
         
@@ -204,7 +307,7 @@ struct FileWrapper {
                 guard wrappable != nil else {
                     return JSValueMakeUndefined(context);
                 }
-                return JSValueMakeNumber(context, wrappable!.size)
+                return JSValueMakeNumber(context, wrappable!.fileDelegate!.size )
             },
             setProperty: nil,
             attributes: JSPropertyAttributes(kJSPropertyAttributeDontDelete)),
@@ -216,7 +319,7 @@ struct FileWrapper {
                 guard wrappable != nil else {
                     return JSValueMakeUndefined(context);
                 }
-                return JSValueMakeString(context, JSCUtils.StringToJSString( wrappable!.path ))
+                return JSValueMakeString(context, JSCUtils.StringToJSString( wrappable!.fileDelegate!.path ))
             },
             setProperty: nil,
             attributes: JSPropertyAttributes(kJSPropertyAttributeDontDelete)),
@@ -228,7 +331,7 @@ struct FileWrapper {
                 guard wrappable != nil else {
                     return JSValueMakeUndefined(context);
                 }
-                return JSValueMakeBoolean(context, wrappable!.exists)
+                return JSValueMakeBoolean(context, wrappable!.fileDelegate!.exists)
             },
             setProperty: nil,
             attributes: JSPropertyAttributes(kJSPropertyAttributeDontDelete)),
@@ -240,7 +343,7 @@ struct FileWrapper {
                 guard wrappable != nil else {
                     return JSValueMakeUndefined(context);
                 }
-                return JSValueMakeBoolean(context, wrappable!.isDirectory)
+                return JSValueMakeBoolean(context, wrappable!.fileDelegate!.isDirectory)
             },
             setProperty: nil,
             attributes: JSPropertyAttributes(kJSPropertyAttributeDontDelete)),
@@ -275,7 +378,7 @@ struct FileWrapper {
             name: (M_LIST_FILES as NSString).utf8String,
             callAsFunction: { context, functionObject, thisObject, argc, argv, exception in
                 if let file: File = Wrappable.from(ref: thisObject) {
-                    if file.isDirectory {
+                    if file.fileDelegate!.isDirectory {
                         let files = file.listFiles()
                         var wrappedFiles: [JSValueRef?] = []
                         for newfile in files {
@@ -294,7 +397,7 @@ struct FileWrapper {
             name: (M_CREATE_WITH_TEXT as NSString).utf8String,
             callAsFunction: { context, functionObject, thisObject, argc, argv, exception in
                 if let file: File = Wrappable.from(ref: thisObject) {
-                    if !file.isDirectory && argc>0 && JSValueIsString(context, argv![0]) {
+                    if !file.fileDelegate!.isDirectory && argc>0 && JSValueIsString(context, argv![0]) {
                         
                         let ret = file.createWithText( JSCUtils.JSStringToString(context!, argv![0]!))
                         return JSValueMakeBoolean(context, ret)
@@ -337,7 +440,7 @@ struct FileWrapper {
     static let convertToTypeCallback : JSObjectConvertToTypeCallback = { context, object, type, exception in
         if ( type==kJSTypeString ) {
             if let file: File = Wrappable.from(ref: object) {
-                return JSCUtils.StringToJSString("File: \(file.path)")
+                return JSCUtils.StringToJSString("File: \(file.fileDelegate!.path)")
             }
         }
         
