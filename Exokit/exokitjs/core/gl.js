@@ -2,6 +2,7 @@ window.performance = {};
 window._gl = {};
 window._canvas = {};
 _canvas.style = {};
+
 _canvas.getContext = function() {
   return _gl;
 };
@@ -63,7 +64,7 @@ _gl.texImage2D = function(p0, p1, p2, p3, p4, p5, p6, p7, p8) {
     var img;
     if (p6) {
         img = p8 || EXOKIT._img;
-        if (!!p8.buffer) {
+        if (p8.buffer) {
             if (p8 instanceof Int32Array) img = {intArray: p8};
             else img = {floatArray: p8};
         }
@@ -74,7 +75,7 @@ _gl.texImage2D = function(p0, p1, p2, p3, p4, p5, p6, p7, p8) {
         _gl._texImage2DShort(p0, p1, p2, p3, p4, img);
     }
 };
-
+//
 _gl.uniform1i = function(location, x) {
     if (typeof x === 'boolean') {
         x = !!x ? 1 : 0;
@@ -99,7 +100,7 @@ _gl.getExtension = function(name) {
 
         case 'OES_standard_derivatives':
         case 'EXT_color_buffer_float':
-        return: {};
+        return {};
         break;
 
         case 'WEBGL_depth_texture':

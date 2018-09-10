@@ -1,4 +1,5 @@
 var parse = require('scriptparser');
 var fs = require('fs');
+var gl = require('./gl');
 
-parse(fs.readFileSync('www/index.html'));
+console.log(window.C_bufferData);

@@ -48,10 +48,39 @@ class GLSurface: GLKViewController {
         
         let _ = GLPropertyBindings(gl: _gl);
         
-        let b = BufferData();
-        b.setContext(_gl.jsValueRef, withGlobal: _context?.jsGlobalContextRef);
-        
+        bindBufferData();
         bindFunctions();
+    }
+    
+    fileprivate func bindBufferData() {
+        let ctx = _context?.jsGlobalContextRef;
+        
+        let bufferDataName = JSCUtils.StringToJSString("C_bufferData");
+        let bufferData = JSObjectMakeFunctionWithCallback(ctx, bufferDataName, { ctx, functionObject, thisObject, argc, argv, exception in
+            let target = JSValueToNumber(ctx, argv![0], nil);
+            let usage = JSValueToNumber(ctx, argv![2], nil);
+            let length = JSObjectGetTypedArrayByteLength(ctx, argv![1], nil);
+            let ptr = JSObjectGetTypedArrayBytesPtr(ctx, argv![1], nil);
+            
+            glBufferData(GLenum(target), length, ptr, GLenum(usage));
+            return JSValueMakeUndefined(ctx)
+        });
+        
+        let bufferSubDataName = JSCUtils.StringToJSString("C_bufferSubData");
+        let bufferSubData = JSObjectMakeFunctionWithCallback(ctx, bufferSubDataName, { ctx, functionObject, thisObject, argc, argv, exception in
+            let target = JSValueToNumber(ctx, argv![0], nil);
+            let offset = JSValueToNumber(ctx, argv![1], nil);
+            let size = JSValueToNumber(ctx, argv![2], nil);
+            let ptr = JSObjectGetTypedArrayBytesPtr(ctx, argv![3], nil);
+            
+            glBufferSubData(GLenum(target), GLintptr(offset), GLsizeiptr(size), ptr)
+            return JSValueMakeUndefined(ctx)
+        });
+        
+        JSObjectSetProperty(ctx, JSContextGetGlobalObject(ctx), bufferDataName, bufferData, JSPropertyAttributes(kJSPropertyAttributeNone), nil);
+        JSObjectSetProperty(ctx, JSContextGetGlobalObject(ctx), bufferSubDataName, bufferSubData, JSPropertyAttributes(kJSPropertyAttributeNone), nil);
+        JSStringRelease(bufferSubDataName);
+        JSStringRelease(bufferDataName);
     }
     
     func BUFFER_OFFSET(_ i: Int) -> UnsafeRawPointer? {
@@ -269,23 +298,25 @@ class GLSurface: GLKViewController {
         let fn: @convention(block) (Int, Int, Int, Int, Int, Int, Int, Int, NSDictionary) -> Void = { target, level, intfr, width, height, border, format, type, img in
             
             if (img["intArray"] != nil) {
-                let array:[Double] = [0, 0, 0, 0];
+                let array = img["intArray"]! as! [Double];
                 glTexImage2D(GLenum(target), GLint(level), GLint(intfr), GLsizei(width), GLsizei(height), GLint(border), GLenum(format), GLenum(type), array.glIntArray)
             } else if (img["floatArray"] != nil) {
-                let array = img["floatArray"]! as! NSArray;
+                let array = img["floatArray"]! as! [Double];
                 glTexImage2D(GLenum(target), GLint(level), GLint(intfr), GLsizei(width), GLsizei(height), GLint(border), GLenum(format), GLenum(type), array.glFloatArray)
-            }
-            
-            let src = img["_src"]! as! String
-            if (src == "-1") {
-                let nulled = calloc(width * height, self.getBytesPerPixel(type: type, format: format));
-                glTexImage2D(GLenum(target), GLint(level), GLint(intfr), GLsizei(width), GLsizei(height), GLint(border), GLenum(format), GLenum(type), nulled)
-                free(nulled)
             } else {
-                let (imageData, _) = Utils.getImageData(path: src);
-                let data = CFDataGetBytePtr(imageData)!
                 
-                glTexImage2D(GLenum(target), GLint(level), GLint(intfr), GLsizei(width), GLsizei(height), GLint(border), GLenum(format), GLenum(type), data)
+                let src = img["_src"]! as! String
+                if (src == "-1") {
+                    let nulled = calloc(width * height, self.getBytesPerPixel(type: type, format: format));
+                    glTexImage2D(GLenum(target), GLint(level), GLint(intfr), GLsizei(width), GLsizei(height), GLint(border), GLenum(format), GLenum(type), nulled)
+                    free(nulled)
+                } else {
+                    let (imageData, _) = Utils.getImageData(path: src);
+                    let data = CFDataGetBytePtr(imageData)!
+                    
+                    glTexImage2D(GLenum(target), GLint(level), GLint(intfr), GLsizei(width), GLsizei(height), GLint(border), GLenum(format), GLenum(type), data)
+                }
+                
             }
         }
         _gl.setObject(unsafeBitCast(fn, to: AnyObject.self), forKeyedSubscript: "_texImage2DLong" as NSString)
