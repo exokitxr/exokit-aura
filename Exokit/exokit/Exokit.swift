@@ -19,5 +19,13 @@ class Exokit {
         Exokit.gl = GLSurface()
         Exokit.gl.setContext(context: Exokit.engine.context)
         Exokit.inst = self
+        
+        initializeCustomCode();
+    }
+    
+    fileprivate func initializeCustomCode() {
+        //use Exokit.engine.browser as the JSValue for custom JavaScriptCore bindings
+        
+        let _ = HydraBinding();
     }
 }

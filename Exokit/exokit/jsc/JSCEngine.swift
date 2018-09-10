@@ -4,6 +4,8 @@ import JavaScriptCore
 
 class JSCEngine {
     var context: JSContext!
+    var browser:JSValue!;
+    
     static var jsContext:JSContext!
     static var active = false;
     static var inst:JSCEngine!;
@@ -16,10 +18,6 @@ class JSCEngine {
         context = JSContext()
         context.exceptionHandler = { context, exception in
             if let exc = exception {
-                let alert = UIAlertController(title: "JS Error", message: exc.toString(), preferredStyle: UIAlertControllerStyle.alert)
-                alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil))
-//                Modules.viewController.present(alert, animated: true, completion: nil)
-                
                 print("!!!!! JS Exception", exc.toString())
             }
         }
@@ -35,9 +33,10 @@ class JSCEngine {
         // execute www folder contents.
         runUserland()
         
-        cleanup();
-        
-        JSCEngine.active = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.cleanup();
+            JSCEngine.active = true
+        }
     }
     
     fileprivate func bootstrapExokit() {
@@ -113,12 +112,20 @@ class JSCEngine {
         let screen = context.objectForKeyedSubscript("screen");
         screen?.setObject(UIScreen.main.bounds.width, forKeyedSubscript: "width" as NSString)
         screen?.setObject(UIScreen.main.bounds.height, forKeyedSubscript: "height" as NSString)
+        
+        browser = context.objectForKeyedSubscript("browser");
     }
     
     fileprivate func cleanup() {
         let exokit = context.objectForKeyedSubscript("EXOKIT");
         let cb = exokit?.objectForKeyedSubscript("onload");
         let _ = cb?.call(withArguments: [])
+    }
+    
+    func createNamespace(_ name: String) -> JSValue {
+        let obj = JSValueMakeFromJSONString(context.jsGlobalContextRef, JSCUtils.StringToJSString("{}"));
+        browser.setObject(obj, forKeyedSubscript: name as NSString);
+        return browser.objectForKeyedSubscript(name)
     }
     
 //    func touchStart(_ values:String) {
