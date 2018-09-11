@@ -141,5 +141,5 @@ function initialize(_gl) {
 }
 
 exports = {
-    initialize: initialize
+    initialize
 };

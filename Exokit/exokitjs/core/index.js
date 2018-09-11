@@ -1,7 +1,7 @@
-var parse = require('scriptparser');
-var fs = require('fs');
-var gl = require('./gl');
-var dom = require('./dom');
+const parse = require('scriptparser');
+const fs = require('fs');
+const gl = require('./gl');
+const dom = require('./dom');
 
 EXOKIT.onDrawFrame = function(stage) {
     window.innerWidth = stage.width;
@@ -18,7 +18,9 @@ EXOKIT.onDrawFrame = function(stage) {
 };
 
 EXOKIT.onload = function() {
-    console.log(window.browser);
+    if (!EXOKIT.rootPath.includes('http')) EXOKIT.rootPath = 'www/' + EXOKIT.rootPath;
+    if (EXOKIT.rootPath.charAt(EXOKIT.rootPath.length-1) != '/') EXOKIT.rootPath += '/';
+    parse(fs.readFileSync('http://localhost/exotest/html'));
     window.fireEvent('load');
     window.onload && window.onload();
 };
@@ -26,7 +28,3 @@ EXOKIT.onload = function() {
 window.requestAnimationFrame = function(callback) {
     EXOKIT.animationFrame = callback;
 };
-
-const rFile = new File("https://www.duckduckgo.com",2);
-console.log( rFile.loadAsText() );
-

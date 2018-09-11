@@ -1,5 +1,6 @@
 const EventEmitter = require('events');
 const gl = require('./gl');
+const fs = require('fs');
 
 function Canvas() {
     this.style = {};
@@ -12,9 +13,14 @@ function Canvas() {
     }
 }
 
-window.document = {};
+function Script() {
+    this.script = true;
+}
+
+window.document = new EventEmitter();
 document.createElement = document.createDocumentFragment = function(type) {
     if (type == 'canvas') return new Canvas();
+    if (type == 'script') return new Script();
     return createElement();
 }
 
@@ -23,6 +29,7 @@ window.document.getElementsByTagName = function() {
 }
 
 window.document.body = createElement();
+window.document.head = createElement();
 window.document.documentElement = createElement();
 window.document.getElementById = document.createElement;
 
@@ -43,7 +50,12 @@ window.history = {};
 function createElement() {
     var el = {};
     el.style = {};
-    el.appendChild = function() {};
+    el.appendChild = function(child) {
+        if (child.script) {
+            let code = fs.readFileSync(EXOKIT.rootPath + child.src);
+            EXOKIT.evaluate(code);
+        }
+    };
 
     return el;
 }
