@@ -19,9 +19,7 @@ class GLSurface: GLKViewController {
         if self.context == nil {
             print("Failed to create GL context")
         }
-        
-        self.view.isMultipleTouchEnabled = true
-        
+                
         GLSurface.glContext = self.context;
         
         EAGLContext.setCurrent(self.context)

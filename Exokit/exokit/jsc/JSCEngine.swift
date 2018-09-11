@@ -129,22 +129,22 @@ class JSCEngine {
         return browser.objectForKeyedSubscript(name)
     }
     
-//    func touchStart(_ values:String) {
-//        let aura = self.context.objectForKeyedSubscript("AURA");
-//        let cb = aura?.objectForKeyedSubscript("touchStart");
-//        let _ = cb?.call(withArguments: [values])
-//    }
-//
-//    func touchMove(_ values:String) {
-//        let aura = self.context.objectForKeyedSubscript("AURA");
-//        let cb = aura?.objectForKeyedSubscript("touchMove");
-//        let _ = cb?.call(withArguments: [values])
-//    }
-//
-//    func touchEnd(_ values:String) {
-//        let aura = self.context.objectForKeyedSubscript("AURA");
-//        let cb = aura?.objectForKeyedSubscript("touchEnd");
-//        let _ = cb?.call(withArguments: [values])
-//    }
+    func touchStart(_ values:String) {
+        let aura = self.context.objectForKeyedSubscript("EXOKIT");
+        let cb = aura?.objectForKeyedSubscript("touchStart");
+        let _ = cb?.call(withArguments: [values])
+    }
+
+    func touchMove(_ values:String) {
+        let aura = self.context.objectForKeyedSubscript("EXOKIT");
+        let cb = aura?.objectForKeyedSubscript("touchMove");
+        let _ = cb?.call(withArguments: [values])
+    }
+
+    func touchEnd(_ values:String) {
+        let aura = self.context.objectForKeyedSubscript("EXOKIT");
+        let cb = aura?.objectForKeyedSubscript("touchEnd");
+        let _ = cb?.call(withArguments: [values])
+    }
 }
 
