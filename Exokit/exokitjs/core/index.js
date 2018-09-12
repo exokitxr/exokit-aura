@@ -40,7 +40,17 @@ console.log('remove');
 et.removeEventListener( "abcd", fn );
 et.emit("abcd",{type:"abcd"});
 et.emit("abcd",{type:"xyz"});
+et.emit("abcd",{type:"none"});
 
 et= null;
+
+console.log("XHR insrtance of EventTarget= "+(XMLHttpRequest instanceof EventTarget));
+var xhr = new XMLHttpRequest();
+for(var i in xhr) {
+    console.log(i);
+}
+xhr.addEventListener("abcd", function(e) { console.log("recevied type: "+e.type) } );
+xhr.emit("abcd",{type:"none"});
+
 
 garbageCollect()

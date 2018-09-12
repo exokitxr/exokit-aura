@@ -80,7 +80,7 @@ class EventTarget : Wrappable {
     }
 
     override func getClass() -> JSClassRef! {
-            return EventTargetWrapper.ClassRef
+        return EventTargetWrapper.ClassRef
     }
     
     override func cleanUp(context: JSContextRef) {
@@ -131,7 +131,6 @@ struct EventTargetWrapper {
         cd.attributes = JSClassAttributes(kJSClassAttributeNone);
         cd.callAsConstructor = EventTargetWrapper.constructorCallback
         cd.finalize = EventTargetWrapper.finalizerCallback
-//        cd.staticValues = UnsafePointer(EventTargetWrapper.staticProperties)
         cd.staticFunctions = UnsafePointer(EventTargetWrapper.staticMethods)
         
         EventTargetWrapper.ClassRef = JSClassCreate( &cd )

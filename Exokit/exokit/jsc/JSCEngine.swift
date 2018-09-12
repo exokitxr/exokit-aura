@@ -80,6 +80,7 @@ class JSCEngine {
         // Initialize Wrapper classes
         FileWrapper.Initialize(context)
         EventTargetWrapper.Initialize(context)
+        XHRWrapper.Initialize(context)  // order is important. XHR extends EventTarget. EventTarget needs be initialized first !!
     }
     
     fileprivate func initEngine() {
