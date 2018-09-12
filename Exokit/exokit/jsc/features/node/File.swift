@@ -198,8 +198,12 @@ class File : Wrappable {
         fileDelegate = wrap
     }
     
-    override func associateWithWrapper(context: JSContextRef) -> JSValueRef {
-        return JSObjectMake(context, FileWrapper.ClassRef!, retainedPointerFor(value: self))
+    override func cleanUp(context: JSContextRef) {
+        super.cleanUp(context: context)
+    }
+    
+    override func getClass() -> JSClassRef! {
+        return FileWrapper.ClassRef
     }
     
     func loadAsText() -> String? {
@@ -449,11 +453,10 @@ struct FileWrapper {
     
     // Finalizer: Free the Wrappable instance.
     static let finalizerCallback : JSObjectFinalizeCallback = { object in
-        
-        let priv = JSObjectGetPrivate(object)
 
-        // convert raw pointer to type (File.self) and release (decrement retain count)
-        let _ = priv?.releasePointer()
+        if let file: File = Wrappable.from(ref: object) {
+            file.cleanUp(context: JSCEngine.jsContext.jsGlobalContextRef)
+        }
     }
     
     // Create and store the class ref.

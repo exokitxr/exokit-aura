@@ -27,6 +27,20 @@ window.requestAnimationFrame = function(callback) {
     EXOKIT.animationFrame = callback;
 };
 
-const rFile = new File("https://www.duckduckgo.com",2);
-console.log( rFile.loadAsText() );
+var et = new EventTarget();
+et.addEventListener("abcd", function(e) { console.log("recevied type: "+e.type) } );
+function fn(e) { console.log("recevied type: "+e.type) }
+et.addEventListener("abcd", fn );
+et.addEventListener("xyz", function(e) { console.log("recevied type: "+e.type) } );
 
+et.emit("abcd",{type:"abcd"});
+et.emit("xyz",{type:"xyz"});
+et.emit("none",{type:"aassdd"});
+console.log('remove');
+et.removeEventListener( "abcd", fn );
+et.emit("abcd",{type:"abcd"});
+et.emit("abcd",{type:"xyz"});
+
+et= null;
+
+garbageCollect()

@@ -79,6 +79,7 @@ class JSCEngine {
         
         // Initialize Wrapper classes
         FileWrapper.Initialize(context)
+        EventTargetWrapper.Initialize(context)
     }
     
     fileprivate func initEngine() {

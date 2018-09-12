@@ -26,6 +26,7 @@
 		6214202B211776C30082A1DB /* AR.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6214202A211776C30082A1DB /* AR.swift */; };
 		6220CED02144CA8100102137 /* www in Resources */ = {isa = PBXBuildFile; fileRef = 6220CECF2144CA8100102137 /* www */; };
 		624618362145F9D800F1BA35 /* HydraBinding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 624618352145F9D800F1BA35 /* HydraBinding.swift */; };
+		964D09E1214861B2007AD7FC /* EventTarget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 964D09E0214861B2007AD7FC /* EventTarget.swift */; };
 		965460A52141CEC100B2CFF1 /* exokitjs in Resources */ = {isa = PBXBuildFile; fileRef = 965460A32141CEC100B2CFF1 /* exokitjs */; };
 		965BE2C52144228500EA4E53 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965BE2C42144228500EA4E53 /* File.swift */; };
 		965BE2C72144335100EA4E53 /* JSCUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965BE2C62144335100EA4E53 /* JSCUtils.swift */; };
@@ -78,6 +79,7 @@
 		6214202A211776C30082A1DB /* AR.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AR.swift; sourceTree = "<group>"; };
 		6220CECF2144CA8100102137 /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; name = www; path = Exokit/www; sourceTree = "<group>"; };
 		624618352145F9D800F1BA35 /* HydraBinding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HydraBinding.swift; sourceTree = "<group>"; };
+		964D09E0214861B2007AD7FC /* EventTarget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventTarget.swift; sourceTree = "<group>"; };
 		965460A32141CEC100B2CFF1 /* exokitjs */ = {isa = PBXFileReference; lastKnownFileType = folder; name = exokitjs; path = Exokit/exokitjs; sourceTree = "<group>"; };
 		965BE2C42144228500EA4E53 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
 		965BE2C62144335100EA4E53 /* JSCUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSCUtils.swift; sourceTree = "<group>"; };
@@ -234,6 +236,7 @@
 				965BE2C42144228500EA4E53 /* File.swift */,
 				965BE2C8214463F900EA4E53 /* UnsafeMutableRawPointer+JSGC.swift */,
 				965BE2CA21452D8600EA4E53 /* Wrappable.swift */,
+				964D09E0214861B2007AD7FC /* EventTarget.swift */,
 			);
 			path = node;
 			sourceTree = "<group>";
@@ -384,6 +387,7 @@
 				6214202B211776C30082A1DB /* AR.swift in Sources */,
 				6214026A2116B9D500C8BB32 /* GLPropertyBindings.swift in Sources */,
 				621402522116A9C400C8BB32 /* Exokit.swift in Sources */,
+				964D09E1214861B2007AD7FC /* EventTarget.swift in Sources */,
 				624618362145F9D800F1BA35 /* HydraBinding.swift in Sources */,
 				965BE2C52144228500EA4E53 /* File.swift in Sources */,
 				965BE2C9214463F900EA4E53 /* UnsafeMutableRawPointer+JSGC.swift in Sources */,

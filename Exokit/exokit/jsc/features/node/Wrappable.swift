@@ -54,7 +54,17 @@ class Wrappable {
     
     // override me please.
     func associateWithWrapper(context: JSContextRef) -> JSValueRef {
+        return JSObjectMake(context, getClass(), retainedPointerFor(value: self))
+    }
+
+    // override me please.
+    func cleanUp(context: JSContextRef) {
+        let priv = JSObjectGetPrivate(wrapper)
+        let _ = priv?.releasePointer()
+    }
+
+    func getClass() -> JSClassRef! {
         assertionFailure("Must override")
-        return JSValueMakeNull(context)
+        return nil
     }
 }
