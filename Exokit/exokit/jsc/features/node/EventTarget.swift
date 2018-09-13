@@ -9,11 +9,13 @@
 import Foundation
 import JavaScriptCore
 
+typealias ContextCallbackPair = (JSGlobalContextRef,JSObjectRef)
+
 class EventTarget : Wrappable {
     
     // map of string -> javascript function
-    fileprivate var eventListeners: [String:[JSValueRef]] = [:]
-    fileprivate var onEventListeners: [String:JSValueRef] = [:]
+    fileprivate var eventListeners: [String:[ContextCallbackPair]] = [:]
+    fileprivate var onEventListeners: [String:ContextCallbackPair] = [:]
     
     override init() {
         super.init()
@@ -27,7 +29,7 @@ class EventTarget : Wrappable {
         }
         
         JSValueProtect( context, callback )
-        callbacks!.append(callback)
+        callbacks!.append((context,callback))
         eventListeners.updateValue(callbacks!, forKey: forEvent)
     }
 
@@ -36,10 +38,13 @@ class EventTarget : Wrappable {
             return
         }
         
-        var nc: [JSValueRef] = []
-        for persistentCallback in callbacks {
-            if !JSValueIsEqual(context, callback, persistentCallback, nil) {
-                nc.append(persistentCallback)
+        var nc: [(JSGlobalContextRef,JSObjectRef)] = []
+        for persistentContextCallbackPair in callbacks {
+            if !JSValueIsEqual(context, callback, persistentContextCallbackPair.1, nil) {
+                nc.append(persistentContextCallbackPair)
+            } else {
+                // unprotect deleted object.
+                JSValueUnprotect(persistentContextCallbackPair.0, persistentContextCallbackPair.1)
             }
         }
         
@@ -54,49 +59,53 @@ class EventTarget : Wrappable {
         let args: [JSValueRef?] = [ eventObject ]
         var exception: JSValueRef?
 
-        for callback in callbacks {
+        for contextCallbackPair in callbacks {
             // invoke callback with eventObject
-            JSObjectCallAsFunction(context, callback, callback, 1, UnsafePointer(args), &exception)
+            JSObjectCallAsFunction(context, contextCallbackPair.1, contextCallbackPair.1, 1, UnsafePointer(args), &exception)
             // bugbug handle exception
         }
         
-        if let callback = onEventListeners[event] {
-            JSObjectCallAsFunction(context, callback, callback, 1, UnsafePointer(args), &exception)
+        if let contextCallbackPair = onEventListeners[event] {
+            JSObjectCallAsFunction(context, contextCallbackPair.1, contextCallbackPair.1, 1, UnsafePointer(args), &exception)
             // bugbug handle exception
         }
     }
     
-    func getOn(event: String) -> JSValueRef? {
+    func getOn(event: String) -> ContextCallbackPair? {
         return onEventListeners[event]
     }
     
-    func setOn(ctx: JSGlobalContextRef, event: String, callback: JSValueRef) -> Void {
+    func setOn(ctx: JSGlobalContextRef, event: String, callback: JSValueRef?) -> Void {
         if let callback = onEventListeners[event] {
-            JSValueUnprotect(ctx, callback)
+            JSValueUnprotect(ctx, callback.1)
         }
         
-        JSValueProtect(ctx, callback)
-        onEventListeners[event] = callback
+        if let callback = callback {
+            JSValueProtect(ctx, callback)
+            onEventListeners[event] = (ctx,callback)
+        } else {
+            onEventListeners.removeValue(forKey: event)
+        }
     }
 
     override func getClass() -> JSClassRef! {
         return EventTargetWrapper.ClassRef
     }
     
-    override func cleanUp(context: JSContextRef) {
+    override func cleanUp() {
         
         // unprotect callbacks
-        for (_,eventListenerCallbacks) in eventListeners {
-            for eventListenerCallback in eventListenerCallbacks {
-                JSValueUnprotect( context, eventListenerCallback )
+        for (_,eventListenerContextCallbackPairs) in eventListeners {
+            for eventListenerContextCallbackPair in eventListenerContextCallbackPairs {
+                JSValueUnprotect( eventListenerContextCallbackPair.0, eventListenerContextCallbackPair.1 )
             }
         }
         
-        for (_,onEventListenerCallback) in onEventListeners {
-            JSValueUnprotect( context, onEventListenerCallback )
+        for (_,onEventListenerContextCallbackPair) in onEventListeners {
+            JSValueUnprotect( onEventListenerContextCallbackPair.0, onEventListenerContextCallbackPair.1 )
         }
         
-        super.cleanUp(context: context)
+        super.cleanUp()
     }
 }
 
@@ -156,7 +165,7 @@ struct EventTargetWrapper {
     // Finalizer: Free the Wrappable instance.
     static let finalizerCallback : JSObjectFinalizeCallback = { object in
         if let et: EventTarget = Wrappable.from(ref: object) {
-            et.cleanUp(context: JSCEngine.jsContext.jsGlobalContextRef)
+            et.cleanUp()
         }
     }
 
@@ -178,7 +187,7 @@ struct EventTargetWrapper {
                         }
                     } else {
                         let wrappable: EventTarget? = Wrappable.from(ref: thisObject)
-                        wrappable?.addEventListener(context: context!, forEvent: event, callback: argv![1]!)
+                        wrappable?.addEventListener(context: JSContextGetGlobalContext(context!), forEvent: event, callback: argv![1]!)
                     }
                 }
                 
@@ -202,7 +211,7 @@ struct EventTargetWrapper {
                         }
                     } else {
                         let wrappable: EventTarget? = Wrappable.from(ref: thisObject)
-                        wrappable?.removeEventListener(context: context!, forEvent: event, callback: argv![1]!)
+                        wrappable?.removeEventListener(context: JSContextGetGlobalContext(context!), forEvent: event, callback: argv![1]!)
                     }
                 }
                 
@@ -222,7 +231,7 @@ struct EventTargetWrapper {
                 } else {
                     let event = JSCUtils.JSStringToString(context!, argv![0]!)
                     let wrappable: EventTarget? = Wrappable.from(ref: thisObject)
-                    wrappable?.emit(context: context!, event: event, eventObject: argv![1]!)
+                    wrappable?.emit(context: JSContextGetGlobalContext(context!), event: event, eventObject: argv![1]!)
                 }
                 
                 return JSValueMakeUndefined(context)

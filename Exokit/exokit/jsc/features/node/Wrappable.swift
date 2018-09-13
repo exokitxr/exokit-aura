@@ -59,7 +59,7 @@ class Wrappable {
     }
 
     // override me please.
-    func cleanUp(context: JSContextRef) {
+    func cleanUp() {
         let priv = JSObjectGetPrivate(wrapper)
         let _ = priv?.releasePointer()
     }

@@ -19,10 +19,15 @@ enum ReadyState {
 
 class XHR : EventTarget {
     
-    var method: String = ""
-    var url: String = ""
-    var responseType: String = ""
-    var overrideMimeType: String = ""
+    var method: String? = nil
+    var url: String? = nil
+    var bodyContents: String? = nil
+    var responseType: String? = nil
+    var overrideMimeType: String? = nil
+    
+    var headers: [String:String]? = nil
+    
+    var contents: Data? = nil
     
     var contentLength: Int = 0
     var timeout: Int = 0
@@ -36,12 +41,61 @@ class XHR : EventTarget {
         return XHRWrapper.ClassRef
     }
     
-    override func cleanUp(context: JSContextRef) {
-        super.cleanUp(context: context)
-    }
-    
     func open(method: String, url: String) {
         
+        self.method = method;
+        self.url = url;
+        
+        if !url.hasPrefix("http") && !url.hasPrefix("asset") {
+            
+            var sep = ""
+            if !url.hasPrefix("/") {
+                sep="/"
+            }
+            
+            self.url = /* HC::JavaEnv::JSEnv()->location_->base() + */ sep + url;
+        }
+        
+        readyState = .OPENED;
+        
+        if let curl = URL(string: url) {
+            var request = URLRequest.init(url: curl)
+            request.httpMethod = method
+            request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
+            
+            if method == "POST" && bodyContents != nil {
+                request.httpBody = Data(base64Encoded: bodyContents!)
+            }
+            
+            if timeout > 0 {
+                request.timeoutInterval = TimeInterval(timeout)
+            }
+            
+            let config = URLSessionConfiguration.default
+            let session = URLSession(configuration: config)
+            
+            let task = session.dataTask(with: request) {  (data, response, error) in
+                
+                guard error == nil else {
+                    // notify error
+                    print(error!)
+                    return
+                }
+                
+                guard let responseData = data else {
+                    // notify error
+                    print("Error: did not receive data")
+                    return
+                }
+                
+                self.contents = responseData
+            }
+            
+            task.resume()
+            
+        } else {
+            // notify error
+        }
     }
 }
 
@@ -78,24 +132,22 @@ struct XHRWrapper {
         cd.finalize = XHRWrapper.finalizerCallback
         cd.staticFunctions = UnsafePointer(XHRWrapper.staticMethods)
         
-        // inherit
-        cd.parentClass = EventTargetWrapper.ClassRef
+        cd.parentClass = EventTargetWrapper.ClassRef    // inherit
         
         XHRWrapper.ClassRef = JSClassCreate( &cd )
     }
     
     static let constructorCallback : JSObjectCallAsConstructorCallback = { context, constructor, argc, argv, exception in
         
-        // things looking good. Create an object with the class template.
-        // make the js-native attachment.
         let xhr = XHR()
         return xhr.associateWithWrapper(context: context!)
     }
     
     // Finalizer: Free the Wrappable instance.
     static let finalizerCallback : JSObjectFinalizeCallback = { object in
+        
         if let xhr: XHR = Wrappable.from(ref: object) {
-            xhr.cleanUp(context: JSCEngine.jsContext.jsGlobalContextRef)
+            xhr.cleanUp()
         }
     }
     
