@@ -1,5 +1,6 @@
 window = this;
 global = this;
+self = this;
 
 window.screen = {};
 window._gl = {};

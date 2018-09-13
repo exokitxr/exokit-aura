@@ -41,3 +41,5 @@ EXOKIT.receiveTransfer = function(key, array) {
     let type = key.split('_')[1].split('/')[0];
     Worker.TRANSFERS[key] = new window[type](array);
 };
+
+window.Worker = Worker;

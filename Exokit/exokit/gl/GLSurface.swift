@@ -34,7 +34,7 @@ class GLSurface: GLKViewController {
         let size:Dictionary = ["width": Int(rect.width), "height": Int(rect.height)];
         let _ = _onDrawFrame?.call(withArguments: [size]);
         
-//        WorkerBackingList.tick();
+        Exokit.tick();
     }
     
     func setContext(context: JSContext) {
