@@ -9,233 +9,70 @@
 import Foundation
 import JavaScriptCore
 
-typealias ContextCallbackPair = (JSGlobalContextRef,JSObjectRef)
+@objc protocol JSEventTarget : JSExport {
+    func addEventListener(_ forEvent: String , _ callback: JSValue) -> Void
+    func removeEventListener(_ forEvent: String, _ callback: JSValue) -> Void
+    func dispatchEvent(_ e: JSValue) -> Void
 
-class EventTarget : Wrappable {
+    static func create() -> Any;
+}
+
+class EventTarget : NSObject, JSEventTarget {
     
     // map of string -> javascript function
-    fileprivate var eventListeners: [String:[ContextCallbackPair]] = [:]
-    fileprivate var onEventListeners: [String:ContextCallbackPair] = [:]
+    fileprivate var eventListeners: [String:[JSManagedValue]] = [:]
+    fileprivate var onEventListeners: [String:JSManagedValue] = [:]
     
-    override init() {
-        super.init()
+    class func create() -> Any {
+        return EventTarget()
     }
     
-    func addEventListener(context: JSGlobalContextRef, forEvent: String, callback: JSValueRef ) -> Void {
+    func addEventListener(_ forEvent: String, _ callback: JSValue ) -> Void {
         var callbacks = eventListeners[forEvent]
         
         if callbacks == nil {
             callbacks = []
         }
         
-        JSValueProtect( context, callback )
-        callbacks!.append((context,callback))
+        callbacks!.append(JSManagedValue(value: callback))
         eventListeners.updateValue(callbacks!, forKey: forEvent)
     }
 
-    func removeEventListener(context: JSGlobalContextRef, forEvent: String, callback: JSValueRef ) -> Void {
+    func removeEventListener(_ forEvent: String, _ callback: JSValue ) -> Void {
         guard let callbacks = eventListeners[forEvent] else {
             return
         }
         
-        var nc: [(JSGlobalContextRef,JSObjectRef)] = []
-        for persistentContextCallbackPair in callbacks {
-            if !JSValueIsEqual(context, callback, persistentContextCallbackPair.1, nil) {
-                nc.append(persistentContextCallbackPair)
-            } else {
-                // unprotect deleted object.
-                JSValueUnprotect(persistentContextCallbackPair.0, persistentContextCallbackPair.1)
+        var nc: [JSManagedValue] = []
+        for rcallback in callbacks {
+            if !callback.isEqual(to: callback) {
+                nc.append(rcallback)
             }
         }
         
         eventListeners[forEvent] = nc
     }
 
-    func emit(context: JSGlobalContextRef, event: String, eventObject: JSValueRef) {
-        guard let callbacks = eventListeners[event] else {
+    func dispatchEvent(_ vevent: JSValue) {
+        
+        if !vevent.isInstance(of: Event.self) {
+            JSContext.current().exception = JSValue(newErrorFromMessage: "argument 1 must be of type Event", in: JSContext.current())
+            return
+        }
+        
+        let event: JSEvent = vevent.toObjectOf(Event.self) as! JSEvent
+        guard let callbacks = eventListeners[event.type] else {
             return
         }
 
-        let args: [JSValueRef?] = [ eventObject ]
-        var exception: JSValueRef?
-
-        for contextCallbackPair in callbacks {
-            // invoke callback with eventObject
-            JSObjectCallAsFunction(context, contextCallbackPair.1, contextCallbackPair.1, 1, UnsafePointer(args), &exception)
-            // bugbug handle exception
+        let args = [event]
+        
+        for callback in callbacks {
+            callback.value.call(withArguments: args)
         }
         
-        if let contextCallbackPair = onEventListeners[event] {
-            JSObjectCallAsFunction(context, contextCallbackPair.1, contextCallbackPair.1, 1, UnsafePointer(args), &exception)
-            // bugbug handle exception
+        if let callback = onEventListeners[event.type] {
+            callback.value.call(withArguments: args)
         }
     }
-    
-    func getOn(event: String) -> ContextCallbackPair? {
-        return onEventListeners[event]
-    }
-    
-    func setOn(ctx: JSGlobalContextRef, event: String, callback: JSValueRef?) -> Void {
-        if let callback = onEventListeners[event] {
-            JSValueUnprotect(ctx, callback.1)
-        }
-        
-        if let callback = callback {
-            JSValueProtect(ctx, callback)
-            onEventListeners[event] = (ctx,callback)
-        } else {
-            onEventListeners.removeValue(forKey: event)
-        }
-    }
-
-    override func getClass() -> JSClassRef! {
-        return EventTargetWrapper.ClassRef
-    }
-    
-    override func cleanUp() {
-        
-        // unprotect callbacks
-        for (_,eventListenerContextCallbackPairs) in eventListeners {
-            for eventListenerContextCallbackPair in eventListenerContextCallbackPairs {
-                JSValueUnprotect( eventListenerContextCallbackPair.0, eventListenerContextCallbackPair.1 )
-            }
-        }
-        
-        for (_,onEventListenerContextCallbackPair) in onEventListeners {
-            JSValueUnprotect( onEventListenerContextCallbackPair.0, onEventListenerContextCallbackPair.1 )
-        }
-        
-        super.cleanUp()
-    }
-}
-
-struct EventTargetWrapper {
- 
-    static let ClassName: String = "EventTarget"
-    static var ClassRef: JSClassRef? = nil
-
-    static func Initialize(_ context: JSContext) {
-        EventTargetWrapper.InitializeClass()
-        EventTargetWrapper.RegisterClass(context)
-    }
-    
-    // Register in global object. Just expose the class ref to the world.
-    fileprivate static func RegisterClass(_ context: JSContext) {
-        let obj: JSObjectRef = JSObjectMake(context.jsGlobalContextRef, EventTargetWrapper.ClassRef, nil);
-        JSObjectSetProperty(
-            context.jsGlobalContextRef,
-            context.globalObject.jsValueRef,
-            JSStringCreateWithUTF8CString(ClassName),
-            obj,
-            JSPropertyAttributes(kJSPropertyAttributeNone),
-            nil);
-    }
-    
-    // Create and store the class ref.
-    fileprivate static func InitializeClass() {
-        
-        var cd = kJSClassDefinitionEmpty
-        
-        cd.className = (ClassName as NSString).utf8String
-        cd.attributes = JSClassAttributes(kJSClassAttributeNone);
-        cd.callAsConstructor = EventTargetWrapper.constructorCallback
-        cd.finalize = EventTargetWrapper.finalizerCallback
-        cd.staticFunctions = UnsafePointer(EventTargetWrapper.staticMethods)
-        
-        EventTargetWrapper.ClassRef = JSClassCreate( &cd )
-    }
-    
-    static let constructorCallback : JSObjectCallAsConstructorCallback = { context, constructor, argc, argv, exception in
-        
-        // check parameters. If not suitable, throw an exception.
-        if argc != 0 {
-            if let exception = exception {
-                exception.pointee = JSCUtils.Exception(context!, "EventTarget constructor needs no parameters.")
-            }
-            // return null on constructor exception. We don't want half-ass baked objects.
-            return JSValueMakeNull(context)
-        }
-        
-        // things looking good. Create an object with the class template.
-        // make the js-native attachment.
-        let et = EventTarget()
-        return et.associateWithWrapper(context: context!)
-    }
-    
-    // Finalizer: Free the Wrappable instance.
-    static let finalizerCallback : JSObjectFinalizeCallback = { object in
-        if let et: EventTarget = Wrappable.from(ref: object) {
-            et.cleanUp()
-        }
-    }
-
-    static let staticMethods = [
-        
-        JSStaticFunction(
-            name: ("addEventListener" as NSString).utf8String,
-            callAsFunction: { context, functionObject, thisObject, argc, argv, exception in
-                
-                if argc<2 {
-                    if let exception = exception {
-                        exception.pointee = JSCUtils.Exception(context!, "addEventListeners needs 2 parameters.")
-                    }
-                } else {
-                    let event = JSCUtils.JSStringToString(context!, argv![0]!)
-                    if !JSValueIsObject(context, argv![1]!) {
-                        if let exception = exception {
-                            exception.pointee = JSCUtils.Exception(context!, "addEventListener needs an object as 2nd parameter.")
-                        }
-                    } else {
-                        let wrappable: EventTarget? = Wrappable.from(ref: thisObject)
-                        wrappable?.addEventListener(context: JSContextGetGlobalContext(context!), forEvent: event, callback: argv![1]!)
-                    }
-                }
-                
-                return JSValueMakeUndefined(context)
-            },
-            attributes: JSPropertyAttributes(kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete)),
-
-        JSStaticFunction(
-            name: ("removeEventListener" as NSString).utf8String,
-            callAsFunction: { context, functionObject, thisObject, argc, argv, exception in
-                
-                if argc<2 {
-                    if let exception = exception {
-                        exception.pointee = JSCUtils.Exception(context!, "removeEventListeners needs 2 parameters.")
-                    }
-                } else {
-                    let event = JSCUtils.JSStringToString(context!, argv![0]!)
-                    if !JSValueIsObject(context, argv![1]!) {
-                        if let exception = exception {
-                            exception.pointee = JSCUtils.Exception(context!, "removeEventListener needs an object as 2nd parameter.")
-                        }
-                    } else {
-                        let wrappable: EventTarget? = Wrappable.from(ref: thisObject)
-                        wrappable?.removeEventListener(context: JSContextGetGlobalContext(context!), forEvent: event, callback: argv![1]!)
-                    }
-                }
-                
-                return JSValueMakeUndefined(context)
-            },
-            attributes: JSPropertyAttributes(kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete)),
-
-
-        JSStaticFunction(
-            name: ("emit" as NSString).utf8String,
-            callAsFunction: { context, functionObject, thisObject, argc, argv, exception in
-                
-                if argc<2 {
-                    if let exception = exception {
-                        exception.pointee = JSCUtils.Exception(context!, "emit needs 2 parameters.")
-                    }
-                } else {
-                    let event = JSCUtils.JSStringToString(context!, argv![0]!)
-                    let wrappable: EventTarget? = Wrappable.from(ref: thisObject)
-                    wrappable?.emit(context: JSContextGetGlobalContext(context!), event: event, eventObject: argv![1]!)
-                }
-                
-                return JSValueMakeUndefined(context)
-            },
-            attributes: JSPropertyAttributes(kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete))
-    ]
 }

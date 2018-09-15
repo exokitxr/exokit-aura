@@ -17,7 +17,12 @@ enum ReadyState {
     case DONE
 }
 
-class XHR : EventTarget {
+@objc protocol JSXHR : JSEventTarget {
+    
+    func open(_ method: String, _ url: String) -> Void
+}
+
+class XHR : EventTarget, JSXHR {
     
     var method: String? = nil
     var url: String? = nil
@@ -33,15 +38,11 @@ class XHR : EventTarget {
     var timeout: Int = 0
     var readyState : ReadyState = .UNSENT
     
-    override init() {
-        super.init()
+    override class func create() -> Any {
+        return XHR()
     }
     
-    override func getClass() -> JSClassRef! {
-        return XHRWrapper.ClassRef
-    }
-    
-    func open(method: String, url: String) {
+    func open(_ method: String, _ url: String) {
         
         self.method = method;
         self.url = url;
@@ -97,110 +98,4 @@ class XHR : EventTarget {
             // notify error
         }
     }
-}
-
-struct XHRWrapper {
-    
-    static let ClassName: String = "XMLHttpRequest"
-    static var ClassRef: JSClassRef? = nil
-
-    static func Initialize(_ context: JSContext) {
-        XHRWrapper.InitializeClass()
-        XHRWrapper.RegisterClass(context)
-    }
-    
-    // Register in global object. Just expose the class ref to the world.
-    fileprivate static func RegisterClass(_ context: JSContext) {
-        let obj: JSObjectRef = JSObjectMake(context.jsGlobalContextRef, XHRWrapper.ClassRef, nil);
-        JSObjectSetProperty(
-            context.jsGlobalContextRef,
-            context.globalObject.jsValueRef,
-            JSStringCreateWithUTF8CString(ClassName),
-            obj,
-            JSPropertyAttributes(kJSPropertyAttributeNone),
-            nil);
-    }
-    
-    // Create and store the class ref.
-    fileprivate static func InitializeClass() {
-        
-        var cd = kJSClassDefinitionEmpty
-        
-        cd.className = (ClassName as NSString).utf8String
-        cd.attributes = JSClassAttributes(kJSClassAttributeNone);
-        cd.callAsConstructor = XHRWrapper.constructorCallback
-        cd.finalize = XHRWrapper.finalizerCallback
-        cd.staticFunctions = UnsafePointer(XHRWrapper.staticMethods)
-        
-        cd.parentClass = EventTargetWrapper.ClassRef    // inherit
-        
-        XHRWrapper.ClassRef = JSClassCreate( &cd )
-    }
-    
-    static let constructorCallback : JSObjectCallAsConstructorCallback = { context, constructor, argc, argv, exception in
-        
-        let xhr = XHR()
-        return xhr.associateWithWrapper(context: context!)
-    }
-    
-    // Finalizer: Free the Wrappable instance.
-    static let finalizerCallback : JSObjectFinalizeCallback = { object in
-        
-        if let xhr: XHR = Wrappable.from(ref: object) {
-            xhr.cleanUp()
-        }
-    }
-    
-    static let staticMethods = [
-        
-        JSStaticFunction(
-            name: ("open" as NSString).utf8String,
-            callAsFunction: { context, functionObject, thisObject, argc, argv, exception in
-                return JSValueMakeUndefined(context)
-            },
-            attributes: JSPropertyAttributes(kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete)),
-        
-        JSStaticFunction(
-            name: ("send" as NSString).utf8String,
-            callAsFunction: { context, functionObject, thisObject, argc, argv, exception in
-                return JSValueMakeUndefined(context)
-            },
-            attributes: JSPropertyAttributes(kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete)),
-        
-        JSStaticFunction(
-            name: ("getAllResponseHeaders" as NSString).utf8String,
-            callAsFunction: { context, functionObject, thisObject, argc, argv, exception in
-                return JSValueMakeUndefined(context)
-            },
-            attributes: JSPropertyAttributes(kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete)),
-        
-        JSStaticFunction(
-            name: ("getResponseHeader" as NSString).utf8String,
-            callAsFunction: { context, functionObject, thisObject, argc, argv, exception in
-                return JSValueMakeUndefined(context)
-            },
-            attributes: JSPropertyAttributes(kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete)),
-        
-        JSStaticFunction(
-            name: ("setRequestHeader" as NSString).utf8String,
-            callAsFunction: { context, functionObject, thisObject, argc, argv, exception in
-                return JSValueMakeUndefined(context)
-            },
-            attributes: JSPropertyAttributes(kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete)),
-        
-        JSStaticFunction(
-            name: ("overrideMimeType" as NSString).utf8String,
-            callAsFunction: { context, functionObject, thisObject, argc, argv, exception in
-                return JSValueMakeUndefined(context)
-            },
-            attributes: JSPropertyAttributes(kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete)),
-        
-        JSStaticFunction(
-            name: ("abort" as NSString).utf8String,
-            callAsFunction: { context, functionObject, thisObject, argc, argv, exception in
-                return JSValueMakeUndefined(context)
-            },
-            attributes: JSPropertyAttributes(kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete)),
-
-        ]
 }
