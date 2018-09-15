@@ -67,7 +67,7 @@ class JSCEngine {
 //        context.globalObject.setObject(FetchRequest.self, forKeyedSubscript: "FetchRequest" as NSString)
 //        context.globalObject.setObject(ARInterface.self, forKeyedSubscript: "ARInterface" as NSString)
 //        context.globalObject.setObject(VideoElementBacking.self, forKeyedSubscript: "VideoElementBacking" as NSString)
-//        context.globalObject.setObject(WorkerBacking.self, forKeyedSubscript: "WorkerBacking" as NSString)
+        context.globalObject.setObject(WorkerBacking.self, forKeyedSubscript: "WorkerBacking" as NSString)
         context.globalObject.setValue(UIScreen.main.nativeScale, forProperty: "devicePixelRatio");
 
         let requireCallback: @convention(block) (String) -> AnyObject = { input in
@@ -112,6 +112,7 @@ class JSCEngine {
         }
         let exokit = context.objectForKeyedSubscript("EXOKIT");
         exokit?.setObject(unsafeBitCast(exokitImport, to: AnyObject.self), forKeyedSubscript: "import" as NSString)
+        exokit?.setObject(Bundle.main.infoDictionary!["EXOKIT_URL"] as! String, forKeyedSubscript: "rootPath" as NSString)
         
         let exokitEvaluate: @convention(block) (String) -> Void = { code in
             self.context.evaluateScript(code, withSourceURL: URL(string:"imported"));
@@ -138,22 +139,22 @@ class JSCEngine {
         return browser.objectForKeyedSubscript(name)
     }
     
-//    func touchStart(_ values:String) {
-//        let aura = self.context.objectForKeyedSubscript("AURA");
-//        let cb = aura?.objectForKeyedSubscript("touchStart");
-//        let _ = cb?.call(withArguments: [values])
-//    }
-//
-//    func touchMove(_ values:String) {
-//        let aura = self.context.objectForKeyedSubscript("AURA");
-//        let cb = aura?.objectForKeyedSubscript("touchMove");
-//        let _ = cb?.call(withArguments: [values])
-//    }
-//
-//    func touchEnd(_ values:String) {
-//        let aura = self.context.objectForKeyedSubscript("AURA");
-//        let cb = aura?.objectForKeyedSubscript("touchEnd");
-//        let _ = cb?.call(withArguments: [values])
-//    }
+    func touchStart(_ values:String) {
+        let aura = self.context.objectForKeyedSubscript("EXOKIT");
+        let cb = aura?.objectForKeyedSubscript("touchStart");
+        let _ = cb?.call(withArguments: [values])
+    }
+
+    func touchMove(_ values:String) {
+        let aura = self.context.objectForKeyedSubscript("EXOKIT");
+        let cb = aura?.objectForKeyedSubscript("touchMove");
+        let _ = cb?.call(withArguments: [values])
+    }
+
+    func touchEnd(_ values:String) {
+        let aura = self.context.objectForKeyedSubscript("EXOKIT");
+        let cb = aura?.objectForKeyedSubscript("touchEnd");
+        let _ = cb?.call(withArguments: [values])
+    }
 }
 

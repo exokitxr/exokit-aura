@@ -1,7 +1,8 @@
-var parse = require('scriptparser');
-var fs = require('fs');
-var gl = require('./gl');
-var dom = require('./dom');
+const parse = require('scriptparser');
+const fs = require('fs');
+const gl = require('./gl');
+const dom = require('./dom');
+const worker = require('./worker');
 
 EXOKIT.onDrawFrame = function(stage) {
     window.innerWidth = stage.width;
@@ -18,7 +19,8 @@ EXOKIT.onDrawFrame = function(stage) {
 };
 
 EXOKIT.onload = function() {
-    console.log(window.browser);
+    if (EXOKIT.rootPath.charAt(EXOKIT.rootPath.length-1) != '/') EXOKIT.rootPath += '/';
+    parse(fs.readFileSync(EXOKIT.rootPath));
     window.fireEvent('load');
     window.onload && window.onload();
 };

@@ -28,4 +28,8 @@ class Exokit {
         
         let _ = HydraBinding();
     }
+    
+    class func tick() {
+        WorkerBackingList.tick();
+    }
 }

@@ -19,9 +19,7 @@ class GLSurface: GLKViewController {
         if self.context == nil {
             print("Failed to create GL context")
         }
-        
-        self.view.isMultipleTouchEnabled = true
-        
+                
         GLSurface.glContext = self.context;
         
         EAGLContext.setCurrent(self.context)
@@ -36,7 +34,7 @@ class GLSurface: GLKViewController {
         let size:Dictionary = ["width": Int(rect.width), "height": Int(rect.height)];
         let _ = _onDrawFrame?.call(withArguments: [size]);
         
-//        WorkerBackingList.tick();
+        Exokit.tick();
     }
     
     func setContext(context: JSContext) {

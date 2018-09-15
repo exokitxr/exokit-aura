@@ -9,14 +9,14 @@ function initialize(_gl) {
 
     _gl.getParameter = function(param) {
         switch (param) {
-            case GL_RENDERER:
-            case GL_SHADING_LANGUAGE_VERSION:
-            case GL_VENDOR:
-            case GL_EXTENSIONS:
-            return _gl.getString(param);
+            case _gl.RENDERER:
+            case _gl.SHADING_LANGUAGE_VERSION:
+            case _gl.VENDOR:
+            case _gl.EXTENSIONS:
+            return _gl._getString(param);
             break;
 
-            case GL_VERSION:
+            case _gl.VERSION:
             if (_gl.type.includes('2')) return 'WebGL 2.0';
             return 'WebGL 1.0';
             break;
@@ -141,5 +141,5 @@ function initialize(_gl) {
 }
 
 exports = {
-    initialize: initialize
+    initialize
 };

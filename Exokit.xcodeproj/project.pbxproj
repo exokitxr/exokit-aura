@@ -28,6 +28,8 @@
 		624618362145F9D800F1BA35 /* HydraBinding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 624618352145F9D800F1BA35 /* HydraBinding.swift */; };
 		964D09E1214861B2007AD7FC /* EventTarget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 964D09E0214861B2007AD7FC /* EventTarget.swift */; };
 		964D09E321493B32007AD7FC /* XHR.swift in Sources */ = {isa = PBXBuildFile; fileRef = 964D09E221493B32007AD7FC /* XHR.swift */; };
+		62CE1F52214A05BD00B2B3AE /* WorkerBacking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62CE1F51214A05BD00B2B3AE /* WorkerBacking.swift */; };
+		62CE1F54214A05EB00B2B3AE /* JSCWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62CE1F53214A05EB00B2B3AE /* JSCWorker.swift */; };
 		965460A52141CEC100B2CFF1 /* exokitjs in Resources */ = {isa = PBXBuildFile; fileRef = 965460A32141CEC100B2CFF1 /* exokitjs */; };
 		965BE2C52144228500EA4E53 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965BE2C42144228500EA4E53 /* File.swift */; };
 		965BE2C72144335100EA4E53 /* JSCUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965BE2C62144335100EA4E53 /* JSCUtils.swift */; };
@@ -83,6 +85,8 @@
 		624618352145F9D800F1BA35 /* HydraBinding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HydraBinding.swift; sourceTree = "<group>"; };
 		964D09E0214861B2007AD7FC /* EventTarget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventTarget.swift; sourceTree = "<group>"; };
 		964D09E221493B32007AD7FC /* XHR.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XHR.swift; sourceTree = "<group>"; };
+		62CE1F51214A05BD00B2B3AE /* WorkerBacking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkerBacking.swift; sourceTree = "<group>"; };
+		62CE1F53214A05EB00B2B3AE /* JSCWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSCWorker.swift; sourceTree = "<group>"; };
 		965460A32141CEC100B2CFF1 /* exokitjs */ = {isa = PBXFileReference; lastKnownFileType = folder; name = exokitjs; path = Exokit/exokitjs; sourceTree = "<group>"; };
 		965BE2C42144228500EA4E53 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
 		965BE2C62144335100EA4E53 /* JSCUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSCUtils.swift; sourceTree = "<group>"; };
@@ -208,6 +212,7 @@
 		621402612116B7B900C8BB32 /* features */ = {
 			isa = PBXGroup;
 			children = (
+				62CE1F50214A051100B2B3AE /* worker */,
 				6260E7C521365CC1007A7DDE /* node */,
 				62142027211774390082A1DB /* ar */,
 				621402642116B86C00C8BB32 /* VideoElementBacking.swift */,
@@ -247,6 +252,15 @@
 				96D7C1C8214B208D00F3B096 /* Event.swift */,
 			);
 			path = node;
+			sourceTree = "<group>";
+		};
+		62CE1F50214A051100B2B3AE /* worker */ = {
+			isa = PBXGroup;
+			children = (
+				62CE1F51214A05BD00B2B3AE /* WorkerBacking.swift */,
+				62CE1F53214A05EB00B2B3AE /* JSCWorker.swift */,
+			);
+			path = worker;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -383,6 +397,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				62CE1F54214A05EB00B2B3AE /* JSCWorker.swift in Sources */,
 				965BE2CB21452D8600EA4E53 /* Wrappable.swift in Sources */,
 				621402582116AB6800C8BB32 /* Utils.swift in Sources */,
 				62142026211773350082A1DB /* ARInterface.swift in Sources */,
@@ -397,6 +412,7 @@
 				6214026A2116B9D500C8BB32 /* GLPropertyBindings.swift in Sources */,
 				621402522116A9C400C8BB32 /* Exokit.swift in Sources */,
 				964D09E1214861B2007AD7FC /* EventTarget.swift in Sources */,
+				62CE1F52214A05BD00B2B3AE /* WorkerBacking.swift in Sources */,
 				624618362145F9D800F1BA35 /* HydraBinding.swift in Sources */,
 				965BE2C52144228500EA4E53 /* File.swift in Sources */,
 				965BE2C9214463F900EA4E53 /* UnsafeMutableRawPointer+JSGC.swift in Sources */,
