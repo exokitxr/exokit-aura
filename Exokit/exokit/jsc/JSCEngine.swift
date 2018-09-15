@@ -17,8 +17,10 @@ class JSCEngine {
     init() {
         context = JSContext()
         context.exceptionHandler = { context, exception in
-            if let exc = exception {
-                print("!!!!! JS Exception", exc.toString())
+            if let value = exception {
+                let stacktrace = value.objectForKeyedSubscript("stack").toString()
+                let moreInfo = "stacktrace: \n\(stacktrace ?? "")."
+                print("!!!!! JS Exception \(value)\n\(moreInfo)")
             }
         }
         
@@ -42,14 +44,17 @@ class JSCEngine {
     fileprivate func bootstrapExokit() {
         requireUtil?.setResolve(resource: "exokitjs/core", ofType: "")
         let exokitjsCorePath = requireUtil?.currentRequireContext() ?? ""
+        let url = URL(string: exokitjsCorePath)
         if let jstxt = try? String(contentsOfFile: "\(exokitjsCorePath)/index.js") {
-            context.evaluateScript(jstxt)
+            context.evaluateScript(jstxt, withSourceURL: url!)
         }
     }
     
     fileprivate func runUserland() {
         requireUtil?.setResolve(resource: "www", ofType: "")
-        context.evaluateScript(Utils.loadJS(name: "index.js"))
+        let ctx = requireUtil?.currentRequireContext()
+        let url = URL(string: ("\(ctx ?? "unknown")/index.js" ))
+        context.evaluateScript(Utils.loadJS(name: "index.js"), withSourceURL: url!)
     }
 
     fileprivate func preInit() {
@@ -78,11 +83,15 @@ class JSCEngine {
         requireUtil = Require()
         
         // Initialize Wrapper classes
-        FileWrapper.Initialize(context)
+        context.setObject(File.self, forKeyedSubscript: "File" as NSString)
+        context.setObject(Event.self, forKeyedSubscript: "Event" as NSString)
+        context.setObject(EventTarget.self, forKeyedSubscript: "EventTarget" as NSString)
+        context.setObject(XHR.self, forKeyedSubscript: "XMLHttpRequest" as NSString)
     }
     
     fileprivate func initEngine() {
-        context.evaluateScript(Utils.loadInternalJS(name: "engine"));
+        let url = URL(string: "\(Bundle.main.bundlePath)/engine.js" )
+        context.evaluateScript( Utils.loadInternalJS(name: "engine"), withSourceURL: url!);
         
         let performanceNow: @convention(block) () -> Double = {
             let nanoTime = DispatchTime.now().uptimeNanoseconds - self._initTime;
@@ -98,14 +107,15 @@ class JSCEngine {
         context.globalObject.setObject(unsafeBitCast(gc, to: AnyObject.self), forKeyedSubscript: "garbageCollect" as NSString)
         
         let exokitImport: @convention(block) (String) -> Void = { path in
-            self.context.evaluateScript(Utils.loadJS(name: path));
+            let url = Utils.loadJS(name: path)
+            self.context.evaluateScript(url, withSourceURL: URL(string: url)!);
         }
         let exokit = context.objectForKeyedSubscript("EXOKIT");
         exokit?.setObject(unsafeBitCast(exokitImport, to: AnyObject.self), forKeyedSubscript: "import" as NSString)
         exokit?.setObject(Bundle.main.infoDictionary!["EXOKIT_URL"] as! String, forKeyedSubscript: "rootPath" as NSString)
         
         let exokitEvaluate: @convention(block) (String) -> Void = { code in
-            self.context.evaluateScript(code);
+            self.context.evaluateScript(code, withSourceURL: URL(string:"imported"));
         }
         exokit?.setObject(unsafeBitCast(exokitEvaluate, to: AnyObject.self), forKeyedSubscript: "evaluate" as NSString)
         exokit?.setValue(ProcessInfo.processInfo.processorCount, forProperty: "processorCount");

@@ -45,7 +45,7 @@ class JSCWorker {
             context.evaluateScript(jstxt)
         }
         
-        FileWrapper.Initialize(context)
+        context.setObject(File.self, forKeyedSubscript: "File" as NSString)
 
         initCommunication();
         

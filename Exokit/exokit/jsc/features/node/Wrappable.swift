@@ -25,7 +25,7 @@ class Wrappable {
     func wrap(in context: JSContextRef) -> JSValueRef {
         if ( !containsWrapper() ) {
             // create a new instance of the stored class ref
-            wrapper = associateWithWrapper(context: context)
+            let _ = associateWithWrapper(context: context)
         }
         
         return wrapper!
@@ -54,7 +54,18 @@ class Wrappable {
     
     // override me please.
     func associateWithWrapper(context: JSContextRef) -> JSValueRef {
+        wrapper = JSObjectMake(context, getClass(), retainedPointerFor(value: self))
+        return wrapper!
+    }
+
+    // override me please.
+    func cleanUp() {
+        let priv = JSObjectGetPrivate(wrapper)
+        let _ = priv?.releasePointer()
+    }
+
+    func getClass() -> JSClassRef! {
         assertionFailure("Must override")
-        return JSValueMakeNull(context)
+        return nil
     }
 }

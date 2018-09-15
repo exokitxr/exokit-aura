@@ -26,6 +26,8 @@
 		6214202B211776C30082A1DB /* AR.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6214202A211776C30082A1DB /* AR.swift */; };
 		6220CED02144CA8100102137 /* www in Resources */ = {isa = PBXBuildFile; fileRef = 6220CECF2144CA8100102137 /* www */; };
 		624618362145F9D800F1BA35 /* HydraBinding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 624618352145F9D800F1BA35 /* HydraBinding.swift */; };
+		964D09E1214861B2007AD7FC /* EventTarget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 964D09E0214861B2007AD7FC /* EventTarget.swift */; };
+		964D09E321493B32007AD7FC /* XHR.swift in Sources */ = {isa = PBXBuildFile; fileRef = 964D09E221493B32007AD7FC /* XHR.swift */; };
 		62CE1F52214A05BD00B2B3AE /* WorkerBacking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62CE1F51214A05BD00B2B3AE /* WorkerBacking.swift */; };
 		62CE1F54214A05EB00B2B3AE /* JSCWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62CE1F53214A05EB00B2B3AE /* JSCWorker.swift */; };
 		965460A52141CEC100B2CFF1 /* exokitjs in Resources */ = {isa = PBXBuildFile; fileRef = 965460A32141CEC100B2CFF1 /* exokitjs */; };
@@ -35,6 +37,7 @@
 		965BE2CB21452D8600EA4E53 /* Wrappable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965BE2CA21452D8600EA4E53 /* Wrappable.swift */; };
 		96A5381A21403D8100A55947 /* Require.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A5381921403D8100A55947 /* Require.swift */; };
 		96A5381C2140530900A55947 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A5381B2140530900A55947 /* String+Extension.swift */; };
+		96D7C1C9214B208D00F3B096 /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96D7C1C8214B208D00F3B096 /* Event.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -80,6 +83,8 @@
 		6214202A211776C30082A1DB /* AR.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AR.swift; sourceTree = "<group>"; };
 		6220CECF2144CA8100102137 /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; name = www; path = Exokit/www; sourceTree = "<group>"; };
 		624618352145F9D800F1BA35 /* HydraBinding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HydraBinding.swift; sourceTree = "<group>"; };
+		964D09E0214861B2007AD7FC /* EventTarget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventTarget.swift; sourceTree = "<group>"; };
+		964D09E221493B32007AD7FC /* XHR.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XHR.swift; sourceTree = "<group>"; };
 		62CE1F51214A05BD00B2B3AE /* WorkerBacking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkerBacking.swift; sourceTree = "<group>"; };
 		62CE1F53214A05EB00B2B3AE /* JSCWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSCWorker.swift; sourceTree = "<group>"; };
 		965460A32141CEC100B2CFF1 /* exokitjs */ = {isa = PBXFileReference; lastKnownFileType = folder; name = exokitjs; path = Exokit/exokitjs; sourceTree = "<group>"; };
@@ -87,8 +92,10 @@
 		965BE2C62144335100EA4E53 /* JSCUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSCUtils.swift; sourceTree = "<group>"; };
 		965BE2C8214463F900EA4E53 /* UnsafeMutableRawPointer+JSGC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UnsafeMutableRawPointer+JSGC.swift"; sourceTree = "<group>"; };
 		965BE2CA21452D8600EA4E53 /* Wrappable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Wrappable.swift; sourceTree = "<group>"; };
+		967EBE602149B58600FD0278 /* exokit-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "exokit-Bridging-Header.h"; sourceTree = "<group>"; };
 		96A5381921403D8100A55947 /* Require.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Require.swift; sourceTree = "<group>"; };
 		96A5381B2140530900A55947 /* String+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
+		96D7C1C8214B208D00F3B096 /* Event.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -149,6 +156,7 @@
 				6214022B2116A84800C8BB32 /* LaunchScreen.storyboard */,
 				6214022E2116A84800C8BB32 /* Info.plist */,
 				624618352145F9D800F1BA35 /* HydraBinding.swift */,
+				967EBE602149B58600FD0278 /* exokit-Bridging-Header.h */,
 			);
 			path = Exokit;
 			sourceTree = "<group>";
@@ -239,6 +247,9 @@
 				965BE2C42144228500EA4E53 /* File.swift */,
 				965BE2C8214463F900EA4E53 /* UnsafeMutableRawPointer+JSGC.swift */,
 				965BE2CA21452D8600EA4E53 /* Wrappable.swift */,
+				964D09E0214861B2007AD7FC /* EventTarget.swift */,
+				964D09E221493B32007AD7FC /* XHR.swift */,
+				96D7C1C8214B208D00F3B096 /* Event.swift */,
 			);
 			path = node;
 			sourceTree = "<group>";
@@ -397,14 +408,17 @@
 				96A5381A21403D8100A55947 /* Require.swift in Sources */,
 				621420292117744C0082A1DB /* ARTracking.swift in Sources */,
 				6214202B211776C30082A1DB /* AR.swift in Sources */,
+				964D09E321493B32007AD7FC /* XHR.swift in Sources */,
 				6214026A2116B9D500C8BB32 /* GLPropertyBindings.swift in Sources */,
 				621402522116A9C400C8BB32 /* Exokit.swift in Sources */,
+				964D09E1214861B2007AD7FC /* EventTarget.swift in Sources */,
 				62CE1F52214A05BD00B2B3AE /* WorkerBacking.swift in Sources */,
 				624618362145F9D800F1BA35 /* HydraBinding.swift in Sources */,
 				965BE2C52144228500EA4E53 /* File.swift in Sources */,
 				965BE2C9214463F900EA4E53 /* UnsafeMutableRawPointer+JSGC.swift in Sources */,
 				621402652116B86C00C8BB32 /* VideoElementBacking.swift in Sources */,
 				621402682116B93200C8BB32 /* GLSurface.swift in Sources */,
+				96D7C1C9214B208D00F3B096 /* Event.swift in Sources */,
 				621402232116A84700C8BB32 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

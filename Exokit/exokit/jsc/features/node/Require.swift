@@ -210,7 +210,8 @@ class Require {
                 
                 // set module contents to actual module evaluated return value.
                 // protect in from GC as well.
-                let retValue = context.evaluateScript(moduleContents)
+                let url = URL(string: resolvedModuleFile!)
+                let retValue = context.evaluateScript(moduleContents, withSourceURL: url!)
                 JSValueProtect(context.jsGlobalContextRef, retValue?.jsValueRef)
                 modules.updateValue(retValue!, forKey: resolvedModuleFile!)
 
