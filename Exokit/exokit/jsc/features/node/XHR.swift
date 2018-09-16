@@ -245,22 +245,9 @@ class XHR : EventTarget, JSXHR {
                 
                 return JSValue(jsValueRef: arrayBufferRef, in: ctx)
 
-                // convert into typed Array
-//                let typeArrayRef = JSObjectMakeTypedArrayWithArrayBuffer(
-//                    ctx.jsGlobalContextRef,
-//                    kJSTypedArrayTypeInt8Array,
-//                    arrayBufferRef,
-//                    &exception)
-//
-//                if exception != nil {
-//                    ctx.exception = JSValue(jsValueRef: exception, in: ctx)
-//                    return nil
-//                }
-//
-//                return JSValue(jsValueRef: typeArrayRef, in: ctx)
             }
         }
         
-        return ""
+        return nil
     }
 }

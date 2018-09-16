@@ -44,22 +44,17 @@ et.addEventListener("xyz", function(e) { console.log("recevied type: "+e.type) }
 
 console.log("XHR insrtance of EventTarget= "+(XMLHttpRequest instanceof EventTarget));
 var xhr = XMLHttpRequest.create();
-
-console.log("XHR structure");
-for(var i in EventTarget) {
-    console.log(i);
-}
 xhr.addEventListener("abcd", function(e) { console.log("recevied type: "+e.type) } );
 xhr.dispatchEvent(Event.create("abcd"));
 
 xhr.addEventListener("readystatechange", function(e) {
      console.log("xhr readystate= "+e.target.readyState+"  "+e.toString());
      if ( e.target.readyState===4 ) {
-                     var ab= e.target.response;
-                     console.log("array buffer length= " + ab.byteLength);
-                     
-                     var ta = new Int8Array(ab);
-                     console.log("ret[0]= " + ta[0]);
+         var ab= e.target.response;
+         console.log("array buffer length= " + ab.byteLength);
+         
+         var ta = new Int8Array(ab);
+         console.log("ret[0]= " + ta[0]);
                      
      }
  });
