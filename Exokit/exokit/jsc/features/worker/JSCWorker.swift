@@ -13,8 +13,10 @@ class JSCWorker {
         
         context = JSContext()
         context.exceptionHandler = { context, exception in
-            if let exc = exception {
-                print("!!!!! THREAD Exception", exc.toString())
+            if let value = exception {
+                let stacktrace = value.objectForKeyedSubscript("stack").toString()
+                let moreInfo = "stacktrace: \n\(stacktrace ?? "")."
+                print("!!!!! JS Exception \(value)\n\(moreInfo)")
             }
         }
         
