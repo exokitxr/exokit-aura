@@ -24,6 +24,11 @@ class JSCWorker {
         context.setObject(unsafeBitCast(log, to: AnyObject.self), forKeyedSubscript: "print" as NSString)
         context.globalObject.setValue(backing.index, forProperty: "THREAD_INDEX");
         
+        context.setObject(File.self, forKeyedSubscript: "File" as NSString)
+        context.setObject(Event.self, forKeyedSubscript: "Event" as NSString)
+        context.setObject(EventTarget.self, forKeyedSubscript: "EventTarget" as NSString)
+        context.setObject(XHR.self, forKeyedSubscript: "XMLHttpRequest" as NSString)
+        
         context.evaluateScript(Utils.loadInternalJS(name: "engine"));
         EXOKIT = context.objectForKeyedSubscript("EXOKIT");
         requireUtil = Require()
@@ -44,9 +49,6 @@ class JSCWorker {
         if let jstxt = try? String(contentsOfFile: "\(exokitjsCorePath)/worker-thread.js") {
             context.evaluateScript(jstxt)
         }
-        
-        context.setObject(File.self, forKeyedSubscript: "File" as NSString)
-        context.setObject(XHR.self, forKeyedSubscript: "XMLHttpRequest" as NSString)
 
         initCommunication();
         

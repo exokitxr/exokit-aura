@@ -1,15 +1,12 @@
 const fs = require('fs');
 const timer = require('./timer');
 const EventEmitter = require('events')
+const f = require('./fetch');
 
 let events = new EventEmitter();
 self.addEventListener = events.addEventListener;
 self.removeEventListener = events.removeEventListener;
-self.fireEvent = events.fireEvent;
-
-EXOKIT.onMessage = msg => {
-    print(msg);
-};
+self.fireEvent = self.dispatchEvent = events.fireEvent;
 
 EXOKIT.tick = _ => {
     self.__internalTimer();

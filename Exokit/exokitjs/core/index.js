@@ -32,7 +32,3 @@ EXOKIT.onload = function() {
 window.requestAnimationFrame = function(callback) {
     EXOKIT.animationFrame = callback;
 };
-
-fetch('http://ip.jsontest.com/').then(e => {
-    // console.log(e.text());
-});

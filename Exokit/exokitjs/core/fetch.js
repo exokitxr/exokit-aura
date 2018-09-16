@@ -13,17 +13,18 @@ window.fetch = function(url, options = {}) {
     const promise = PromiseCreate();
     const request = XMLHttpRequest.create();
 
+    if (!url.includes('http')) url = EXOKIT.rootPath + url;
+
     for (let i in options.headers) {
         request.setRequestHeader(i, options.headers[i]);
     }
 
     request.addEventListener('readystatechange', e => {
-        console.log(e.target.readyState);
-        // if (e.target.readyState === 4) {
-        //     promise.resolve(response());
-        // } else {
-        //     promise.reject();
-        // }
+        if (e.target.readyState === 4) {
+            promise.resolve(response());
+        } else if (e.target.readyState !== 1) {
+            promise.reject();
+        }
     });
 
     function response() {
