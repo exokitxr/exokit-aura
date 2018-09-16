@@ -31,38 +31,15 @@ enum ReadyState {
     var timeout: Int {get set}
     var readyState: Int {get}
     var responseType: String {get set}
-    var url: String? {get}
+    var responseURL: String? {get}
     var response: Any? {get}
     
     func open(_ method: String, _ url: String) -> Void
     func send() -> Void
     func responseText() -> String?
-}
-
-@objc protocol JSXHREvent : JSEvent, JSExport {
-    var target: XHR? { get }
-    var currentTarget: XHR? { get }
-    
-    static func create() -> Any;
-}
-
-class EventXHR : Event, JSXHREvent {
-
-    var target: XHR? = nil
-    var currentTarget: XHR? = nil
-    
-    init() {
-        super.init(type: "readystatechange")
-    }
-    
-    class func create() -> Any {
-        return EventXHR()
-    }
-    
-    func setTarget(_ t: XHR) -> Void {
-        target = t
-        currentTarget = t
-    }
+    func setRequestHeader(_ key: String, _ value:String) -> Void
+    func getResponseHeader(_ header: String) -> String?
+    func getAllResponseHeaders() -> String?
 }
 
 class XHR : EventTarget, JSXHR {
@@ -71,17 +48,20 @@ class XHR : EventTarget, JSXHR {
     var timeout: Int = 0
     var readyState: Int = 0
     var responseType: String = ""
+    var status: Int = 0
 
     var contents: Data? = nil
     var contentLength: Int64 = 0
-    var url: String? = nil
+    var responseURL: String? = nil
     
     fileprivate var readyStateType: ReadyState = .UNSENT
+    var headers: [String:String]? = nil
+    var responseHeaders: [String:String]? = nil
     
     //
     var bodyContents: String? = nil
     var overrideMimeType: String? = nil
-    var headers: [String:String]? = nil
+    
     
     override init() {
         super.init()
@@ -102,7 +82,7 @@ class XHR : EventTarget, JSXHR {
         
         readyStateType = r
         
-        let ev = EventXHR()
+        let ev = Event(type: "readystatechange")
         ev.setTarget(self)
         dispatchEventImpl(ev)
     }
@@ -110,7 +90,7 @@ class XHR : EventTarget, JSXHR {
     func open(_ method: String, _ url: String) -> Void {
         
         self.method = method;
-        self.url = url;
+        self.responseURL = url;
         
         if !url.hasPrefix("http") && !url.hasPrefix("asset") {
             
@@ -119,15 +99,21 @@ class XHR : EventTarget, JSXHR {
                 sep="/"
             }
             
-            self.url = /* HC::JavaEnv::JSEnv()->location_->base() + */ sep + url;
+            self.responseURL = /* HC::JavaEnv::JSEnv()->location_->base() + */ sep + url;
         }
         
         setReadyState(.OPENED)
     }
     
+    func setRequestHeader(_ key: String, _ value:String) -> Void {
+        if readyStateType == .OPENED {
+            headers?.updateValue(value, forKey: key)
+        }
+    }
+    
     func send() -> Void {
         
-        if let curl = URL(string: self.url!) {
+        if let curl = URL(string: self.responseURL!) {
             var request = URLRequest.init(url: curl)
             request.httpMethod = method
             request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
@@ -141,6 +127,7 @@ class XHR : EventTarget, JSXHR {
             }
             
             let config = URLSessionConfiguration.default
+            config.httpAdditionalHeaders =  headers
             let session = URLSession(configuration: config)
             
             let task = session.dataTask(with: request) {  (data, response, error) in
@@ -158,7 +145,15 @@ class XHR : EventTarget, JSXHR {
                 }
                 
                 self.contents = responseData
-                self.contentLength = response?.expectedContentLength ?? 0
+                let httpresponse = response as! HTTPURLResponse
+                self.contentLength = httpresponse.expectedContentLength
+                self.status = httpresponse.statusCode
+                self.responseURL = httpresponse.url?.path
+                
+                for (k,v) in httpresponse.allHeaderFields {
+                    self.responseHeaders?.updateValue(v as! String, forKey: k as! String)
+                }
+                
                 self.setReadyState(.DONE)
             }
             
@@ -188,6 +183,55 @@ class XHR : EventTarget, JSXHR {
         }
     }
     
+    fileprivate func getAsArrayBuffer() -> Any? {
+        if let ctx = JSContext.current() {
+            
+            // allocate a pointer to hold contents
+            let ptr: UnsafeMutableBufferPointer<UInt8> = UnsafeMutableBufferPointer<UInt8>.allocate(capacity: contents!.count)
+            
+            // copy Data into ptr
+            contents?.withUnsafeBytes { (contentsPtr: UnsafePointer<UInt8>) -> Void in
+                let _ = ptr.initialize(from: UnsafeBufferPointer(start: contentsPtr, count: contents!.count))
+            }
+            
+            // another way of copying Data contents using Extension.
+            // let _ = ptr.initialize(from: contents!.copyBytes(as: UInt8.self))
+            
+            var exception : JSValueRef?
+            let deallocator: JSTypedArrayBytesDeallocator = { ptr, deallocatorContext in
+                // print( String(bytesNoCopy: ptr!, length: 21, encoding: String.Encoding.utf8, freeWhenDone: false) ?? "abcd" )
+                ptr?.deallocate()
+            }
+            
+            let arrayBufferRef = JSObjectMakeArrayBufferWithBytesNoCopy(
+                ctx.jsGlobalContextRef,
+                ptr.baseAddress,
+                contents!.count,
+                deallocator,
+                nil,
+                &exception)
+            
+            if exception != nil {
+                ctx.exception = JSValue(jsValueRef: exception, in: ctx)
+                return nil
+            }
+            
+            return JSValue(jsValueRef: arrayBufferRef, in: ctx)
+            
+        }
+        
+        return nil
+    }
+    
+    fileprivate func getAsJSON() -> Any? {
+        if let text = responseText(), let ctx = JSContext.current() {
+            let arrayBufferRef = JSValueMakeFromJSONString(ctx.jsGlobalContextRef, JSCUtils.StringToJSString(text))
+            return JSValue(jsValueRef: arrayBufferRef, in: ctx)
+        }
+
+        return nil
+    }
+    
     fileprivate func getResponse() -> Any? {
         
         guard readyStateType == .DONE else {
@@ -199,55 +243,37 @@ class XHR : EventTarget, JSXHR {
         }
         
         if responseType == "text" {
-            
             return responseText() as Any
         } else if responseType == "json" {
-            
-            if let text = responseText() {
-                if let ctx = JSContext.current() {
-                    let arrayBufferRef = JSValueMakeFromJSONString(ctx.jsGlobalContextRef, JSCUtils.StringToJSString(text))
-                    return JSValue(jsValueRef: arrayBufferRef, in: ctx)
-                }
-            }
+            return getAsJSON()
         } else if responseType == "arraybuffer" {
-            
-            if let ctx = JSContext.current() {
-
-                // allocate a pointer to hold contents
-                let ptr: UnsafeMutableBufferPointer<UInt8> = UnsafeMutableBufferPointer<UInt8>.allocate(capacity: contents!.count)
-                
-                // copy Data into ptr
-                contents?.withUnsafeBytes { (contentsPtr: UnsafePointer<UInt8>) -> Void in
-                    let _ = ptr.initialize(from: UnsafeBufferPointer(start: contentsPtr, count: contents!.count))
-                }
-
-                // another way of copying Data contents using Extension.
-                // let _ = ptr.initialize(from: contents!.copyBytes(as: UInt8.self))
-                
-                var exception : JSValueRef?
-                let deallocator: JSTypedArrayBytesDeallocator = { ptr, deallocatorContext in
-                    // print( String(bytesNoCopy: ptr!, length: 21, encoding: String.Encoding.utf8, freeWhenDone: false) ?? "abcd" )
-                    ptr?.deallocate()
-                }
-                
-                let arrayBufferRef = JSObjectMakeArrayBufferWithBytesNoCopy(
-                    ctx.jsGlobalContextRef,
-                    ptr.baseAddress,
-                    contents!.count,
-                    deallocator,
-                    nil,
-                    &exception)
-                
-                if exception != nil {
-                    ctx.exception = JSValue(jsValueRef: exception, in: ctx)
-                    return nil
-                }
-                
-                return JSValue(jsValueRef: arrayBufferRef, in: ctx)
-
-            }
+            return getAsArrayBuffer()
         }
         
         return nil
+    }
+    
+    func getResponseHeader(_ header: String) -> String? {
+        guard readyStateType == .DONE else {
+            return nil
+        }
+        return responseHeaders?[header] ?? nil
+    }
+    
+    func getAllResponseHeaders() -> String? {
+        guard readyStateType == .DONE else {
+            return nil
+        }
+
+        guard responseHeaders != nil else {
+            return nil
+        }
+        
+        var ret = ""
+        for (k,v) in responseHeaders! {
+            ret.append("\(k): \(v)\r\n")
+        }
+        
+        return ret
     }
 }
