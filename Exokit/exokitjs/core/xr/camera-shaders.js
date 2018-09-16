@@ -9,8 +9,8 @@ const mat3 yuv2rgb = mat3(
                           );
 
 vec4 getRGB(vec2 uv) {
-    vec4 lum = texture(tChroma, uv);
-    vec4 chroma = texture(tLum, uv);
+    vec4 lum = texture(tLum, uv);
+    vec4 chroma = texture(tChroma, uv);
 
     vec3 yuv = vec3(
                         1.1643 * (lum.r - 0.0625),
@@ -47,7 +47,7 @@ void main() {
     vec2 uv = vUv;
     uv.y = 1.0 - uv.y;
 
-    FragColor = getRGB(uv)
+    FragColor = getRGB(uv);
 }
 `;
 
@@ -67,7 +67,7 @@ void main() {
     uv.x = 1.0 - c.x;
     uv.y = 1.0 - c.y;
 
-    FragColor = getRGB(uv)
+    FragColor = getRGB(uv);
 }
 `;
 
@@ -87,7 +87,7 @@ void main() {
     uv.x = c.y;
     uv.y = 1.0 - c.x;
 
-    FragColor = getRGB(uv)
+    FragColor = getRGB(uv);
 }
 `;
 
@@ -107,7 +107,7 @@ void main() {
     uv.x = 1.0 - c.y;
     uv.y = c.x;
 
-    FragColor = getRGB(uv)
+    FragColor = getRGB(uv);
 }
 `;
 

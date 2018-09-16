@@ -6,7 +6,7 @@ const worker = require('./worker');
 const xr = require('./xr');
 const f = require('./fetch');
 
-// setTimeout(_ => xr.init(), 1000);
+setTimeout(_ => xr.init(), 1000);
 
 EXOKIT.onDrawFrame = function(stage) {
     window.innerWidth = stage.width;

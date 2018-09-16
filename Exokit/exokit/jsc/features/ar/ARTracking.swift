@@ -186,7 +186,6 @@ class ARTracking : NSObject, ARSessionDelegate {
                 NSLog("Error at CVOpenGLESTextureCacheCreateTextureFromImage \(err)");
             }
             
-            
         } else {
             let err = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault,
                                                                    videoTextureCache,

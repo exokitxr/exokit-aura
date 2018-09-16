@@ -1,12 +1,16 @@
-const {PlaneGeometry, Renderer, Shader, FBO} = require('exokitgl');
+const {PlaneGeometry, Renderer, Shader, FBO, Texture} = require('exokitgl');
 const shaderCode = require('./camera-shaders');
 
 const renderer = new Renderer();
 
-class PerspectiveCamera {
+function createImg(type) {
+    return {src: type, _src: type};
+}
+
+class Camera {
     constructor() {
-        this.lum = new Texture('EXOKIT_LUMINANCE');
-        this.chroma = new Texture('EXOKIT_CHROMA');
+        this.lum = new Texture(createImg('EXOKIT_LUMINANCE'));
+        this.chroma = new Texture(createImg('EXOKIT_CHROMA'));
         this.lum.dynamic = this.chroma.dynamic = true;
 
         this.renderer = new Renderer();
@@ -22,8 +26,8 @@ class PerspectiveCamera {
 
         ['landscapeLeft', 'landscapeRight', 'portraitUpsideDown', 'portrait'].forEach(name => {
             let cameraShader = new Shader(shaderCode.vs, shaderCode[name], {
-                tChroma: {type: 't', value: _this.lum},
-                tLum: {type: 't', value: _this.chroma}
+                tChroma: {type: 't', value: _this.chroma},
+                tLum: {type: 't', value: _this.lum}
             });
 
             _this.shaders[name] = cameraShader;
@@ -47,4 +51,4 @@ class PerspectiveCamera {
     }
 }
 
-exports = {PerspectiveCamera};
+exports = {Camera};
