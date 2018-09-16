@@ -63,9 +63,12 @@ class XHR : EventTarget, JSXHR {
     var bodyContents: String? = nil
     var overrideMimeType: String? = nil
     
-    
     override init() {
         super.init()
+    }
+    
+    deinit {
+        print()
     }
 
     override class func create() -> Any {
@@ -216,8 +219,6 @@ class XHR : EventTarget, JSXHR {
                 ctx.exception = JSValue(jsValueRef: exception, in: ctx)
                 return nil
             }
-            
-            
             
             return JSValue(jsValueRef: arrayBufferRef, in: ctx)
         }

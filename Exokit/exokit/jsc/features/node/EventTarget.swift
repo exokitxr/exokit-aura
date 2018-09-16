@@ -27,6 +27,14 @@ class EventTarget : NSObject, JSEventTarget {
         super.init()
     }
     
+    deinit {
+        for arrcallback in eventListeners.values {
+            for callback in arrcallback {
+                JSValueProtect(JSContext.current().jsGlobalContextRef, callback.value.jsValueRef)
+            }
+        }
+    }
+    
     class func create() -> Any {
         return EventTarget()
     }
@@ -44,7 +52,8 @@ class EventTarget : NSObject, JSEventTarget {
             callbacks = []
         }
         
-        callbacks!.append(JSManagedValue(value: callback))
+        JSValueProtect(JSContext.current().jsGlobalContextRef, callback.jsValueRef)
+        callbacks!.append(JSManagedValue(value: callback, andOwner: self))
         eventListeners.updateValue(callbacks!, forKey: forEvent)
     }
 
@@ -61,6 +70,8 @@ class EventTarget : NSObject, JSEventTarget {
         for rcallback in callbacks {
             if !callback.isEqual(to: callback) {
                 nc.append(rcallback)
+            } else {
+                JSValueProtect(JSContext.current().jsGlobalContextRef, rcallback.value.jsValueRef)
             }
         }
         
