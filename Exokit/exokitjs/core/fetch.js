@@ -22,9 +22,10 @@ window.fetch = function(url, options = {}) {
     request.addEventListener('readystatechange', e => {
         if (e.target.readyState === 4) {
             promise.resolve(response());
-            request = null;
+            request = promise = null;
         } else if (e.target.readyState !== 1) {
             promise.reject();
+            request = promise = null;
         }
     });
 
