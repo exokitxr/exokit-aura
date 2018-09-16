@@ -32,6 +32,12 @@ class EventTarget : NSObject, JSEventTarget {
     }
     
     func addEventListener(_ forEvent: String, _ callback: JSValue ) -> Void {
+        
+        if callback.isNull || callback.isUndefined {
+            JSContext.current().exception = JSValue(newErrorFromMessage: "addEventListener with wrong callback.", in: JSContext.current())
+            return
+        }
+        
         var callbacks = eventListeners[forEvent]
         
         if callbacks == nil {
@@ -43,6 +49,10 @@ class EventTarget : NSObject, JSEventTarget {
     }
 
     func removeEventListener(_ forEvent: String, _ callback: JSValue ) -> Void {
+        if callback.isNull || callback.isUndefined {
+            return
+        }
+
         guard let callbacks = eventListeners[forEvent] else {
             return
         }
@@ -58,6 +68,10 @@ class EventTarget : NSObject, JSEventTarget {
     }
 
     func dispatchEvent(_ vevent: JSValue) {
+        
+        if vevent.isNull || vevent.isUndefined {
+            return
+        }
         
         if !vevent.isInstance(of: Event.self) {
             JSContext.current().exception = JSValue(newErrorFromMessage: "argument 1 must be of type Event", in: JSContext.current())
