@@ -23,6 +23,10 @@ class EventTarget : NSObject, JSEventTarget {
     fileprivate var eventListeners: [String:[JSManagedValue]] = [:]
     fileprivate var onEventListeners: [String:JSManagedValue] = [:]
     
+    override init() {
+        super.init()
+    }
+    
     class func create() -> Any {
         return EventTarget()
     }
@@ -61,6 +65,12 @@ class EventTarget : NSObject, JSEventTarget {
         }
         
         let event: JSEvent = vevent.toObjectOf(Event.self) as! JSEvent
+        
+        dispatchEventImpl(event)
+    }
+    
+    func dispatchEventImpl(_ event: JSEvent) {
+        
         guard let callbacks = eventListeners[event.type] else {
             return
         }
