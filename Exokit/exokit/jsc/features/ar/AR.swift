@@ -22,6 +22,7 @@ class AR: NSObject, ARSessionDelegate {
         session.run(configuration)
         
         tracking = ARTracking(session)
+        Exokit.ar = self
     }
     
     func session(_ session: ARSession, didFailWithError error: Error) {
@@ -52,10 +53,10 @@ class AR: NSObject, ARSessionDelegate {
     }
     
     func uploadCameraTexture(_ name:String) {
-        tracking.uploadCameraTexture(name);
+        tracking.uploadCameraTexture(name)
     }
     
     func cleanUpTextures() {
-        tracking.cleanUpTextures();
+        tracking.cleanUpTextures()
     }
 }

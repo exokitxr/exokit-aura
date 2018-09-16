@@ -65,7 +65,7 @@ class JSCEngine {
         
         
 //        context.globalObject.setObject(FetchRequest.self, forKeyedSubscript: "FetchRequest" as NSString)
-//        context.globalObject.setObject(ARInterface.self, forKeyedSubscript: "ARInterface" as NSString)
+        context.globalObject.setObject(ARInterface.self, forKeyedSubscript: "ARInterface" as NSString)
 //        context.globalObject.setObject(VideoElementBacking.self, forKeyedSubscript: "VideoElementBacking" as NSString)
         context.globalObject.setObject(WorkerBacking.self, forKeyedSubscript: "WorkerBacking" as NSString)
         context.globalObject.setValue(UIScreen.main.nativeScale, forProperty: "devicePixelRatio");
