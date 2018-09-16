@@ -1,6 +1,8 @@
 const {PlaneGeometry, Renderer, Shader, FBO, Matrix4, Vector3, Vector2, Quaternion, Euler, Group, PerspectiveCamera} = require('exokitgl');
 const {Camera} = require('./camera');
 
+var _camera;
+
 let renderer = new Renderer();
 let rotation = new Euler();
 let cameraGroup = new Group();
@@ -33,7 +35,7 @@ out vec4 FragColor;
 uniform sampler2D tMap;
 
 void main() {
-    FragColor = vec4(vUv, 0.0, 1.0);
+    FragColor = texture(tMap, vUv);
 }
 `;
 
@@ -42,8 +44,8 @@ function radians(degrees) {
 }
 
 window.EXOKIT_AR = {};
-EXOKIT_AR.setTrackingOrientation = function(name) {
-    _camera.orientation = name;
+EXOKIT_AR.setTrackingOrientation = function(orientation) {
+    if (_camera) _camera.orientation = orientation;
 
     switch (orientation) {
         case 'portrait': euler.z = radians(90); break;
@@ -56,7 +58,7 @@ EXOKIT_AR.setTrackingOrientation = function(name) {
 };
 
 EXOKIT_AR.setRotation = function(value) {
-    rotation.setFromArray(value);
+    rotation.fromArray(value);
 };
 
 EXOKIT_AR.setTransform = function(value) {
@@ -86,15 +88,24 @@ EXOKIT_AR.setTrackingState = function() {
 };
 
 function init() {
-    // let camera = new Camera();
-    // camera.draw();
+    _camera = new Camera();
 
-    ARInterface.create();
+    window.requestAnimationFrame = function() {
+
+    };
 
     let geom = new PlaneGeometry(2, 2);
     let shader = new Shader(vs, fs, {
-        // tMap: {type: 't', value: camera.texture}
+        tMap: {type: 't', value: _camera.texture}
     });
+
+    EXOKIT.animationFrame = function() {
+        // console.log('draw');
+        _camera.draw();
+        renderer.draw(shader, geom);
+    }
+
+    ARInterface.create();
 
     renderer.draw(shader, geom);
 }
