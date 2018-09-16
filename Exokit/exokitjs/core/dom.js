@@ -69,7 +69,7 @@ function createElement() {
 let events = new EventEmitter();
 window.addEventListener = events.addEventListener;
 window.removeEventListener = events.removeEventListener;
-window.fireEvent = events.fireEvent;
+window.fireEvent = window.dispatchEvent = events.fireEvent;
 
 window.Image = function() { };
 Image.prototype = {

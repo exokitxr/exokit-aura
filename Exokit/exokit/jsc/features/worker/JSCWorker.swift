@@ -46,6 +46,7 @@ class JSCWorker {
         }
         
         context.setObject(File.self, forKeyedSubscript: "File" as NSString)
+        context.setObject(XHR.self, forKeyedSubscript: "XMLHttpRequest" as NSString)
 
         initCommunication();
         
