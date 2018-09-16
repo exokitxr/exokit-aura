@@ -33,7 +33,7 @@ class JSCEngine {
         // execute exokitjs/core
         bootstrapExokit()
         // execute www folder contents.
-        runUserland()
+//        runUserland()
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             self.cleanup();

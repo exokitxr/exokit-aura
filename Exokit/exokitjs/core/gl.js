@@ -53,7 +53,7 @@ function initialize(_gl) {
         var img;
         if (p6) {
             img = p8 || EXOKIT._img;
-            if (p8.buffer) {
+            if (p8 && p8.buffer) {
                 if (p8 instanceof Int32Array) img = {intArray: p8};
                 else img = {floatArray: p8};
             }

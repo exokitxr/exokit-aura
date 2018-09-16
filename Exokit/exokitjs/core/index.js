@@ -3,6 +3,9 @@ const fs = require('fs');
 const gl = require('./gl');
 const dom = require('./dom');
 const worker = require('./worker');
+const xr = require('./xr');
+
+setTimeout(_ => xr.init(), 1000);
 
 EXOKIT.onDrawFrame = function(stage) {
     window.innerWidth = stage.width;

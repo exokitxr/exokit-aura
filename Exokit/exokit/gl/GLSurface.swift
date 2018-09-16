@@ -53,7 +53,7 @@ class GLSurface: GLKViewController {
     fileprivate func bindBufferData() {
         let ctx = _context?.jsGlobalContextRef;
         
-        let bufferDataName = JSCUtils.StringToJSString("C_bufferData");
+        let bufferDataName = JSCUtils.StringToJSString("C_glBufferData");
         let bufferData = JSObjectMakeFunctionWithCallback(ctx, bufferDataName, { ctx, functionObject, thisObject, argc, argv, exception in
             let target = JSValueToNumber(ctx, argv![0], nil);
             let usage = JSValueToNumber(ctx, argv![2], nil);
@@ -64,7 +64,7 @@ class GLSurface: GLKViewController {
             return JSValueMakeUndefined(ctx)
         });
         
-        let bufferSubDataName = JSCUtils.StringToJSString("C_bufferSubData");
+        let bufferSubDataName = JSCUtils.StringToJSString("C_glBufferSubData");
         let bufferSubData = JSObjectMakeFunctionWithCallback(ctx, bufferSubDataName, { ctx, functionObject, thisObject, argc, argv, exception in
             let target = JSValueToNumber(ctx, argv![0], nil);
             let offset = JSValueToNumber(ctx, argv![1], nil);
