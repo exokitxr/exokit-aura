@@ -50,4 +50,12 @@ class AR: NSObject, ARSessionDelegate {
     func session(_ session: ARSession, didRemove anchors: [ARAnchor]) {
         tracking.removeAnchors(anchors)
     }
+    
+    func uploadCameraTexture(_ name:String) {
+        tracking.uploadCameraTexture(name);
+    }
+    
+    func cleanUpTextures() {
+        tracking.cleanUpTextures();
+    }
 }

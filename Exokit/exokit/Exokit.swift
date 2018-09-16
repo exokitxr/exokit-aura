@@ -13,6 +13,7 @@ class Exokit {
     static var engine: JSCEngine!
     static var gl: GLSurface!
     static var inst: Exokit!
+    static var ar: AR?
     
     init() {
         Exokit.engine = JSCEngine()

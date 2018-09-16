@@ -35,6 +35,7 @@ class GLSurface: GLKViewController {
         let _ = _onDrawFrame?.call(withArguments: [size]);
         
         Exokit.tick();
+        Exokit.ar?.cleanUpTextures();
     }
     
     func setContext(context: JSContext) {
@@ -237,8 +238,8 @@ class GLSurface: GLKViewController {
     fileprivate func _texImage2DShort() {
         let fn: @convention(block) (Int, Int, Int, Int, Int, NSDictionary) -> Void = { target, level, intfr, format, type, img in
             let src =  img["_src"]! as! String
-            if (src.contains("AURA_")) {
-//                Aura.ar?.uploadCameraTexture(src)
+            if (src.contains("EXOKIT_")) {
+                Exokit.ar?.uploadCameraTexture(src)
             } else if (src.contains("mp4")) {
                 VideoElementBackingList.get(src).texImage2D(target, level, intfr, format, type);
             } else {

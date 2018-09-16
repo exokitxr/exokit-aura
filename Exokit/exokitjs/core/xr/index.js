@@ -1,5 +1,5 @@
 const {PlaneGeometry, Renderer, Shader, FBO} = require('exokitgl');
-const camera = require('./camera');
+const {Camera} = require('./camera');
 
 let renderer = new Renderer();
 
@@ -30,12 +30,12 @@ void main() {
 `;
 
 function init() {
-    camera.init();
+    let camera = new Camera();
     camera.draw();
 
     let geom = new PlaneGeometry(2, 2);
     let shader = new Shader(vs, fs, {
-        tMap: {type: 't', value: camera.getFBO().texture}
+        tMap: {type: 't', value: camera.texture}
     });
 
     renderer.draw(shader, geom);

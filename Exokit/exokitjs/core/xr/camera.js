@@ -26,30 +26,32 @@ void main() {
 }
 `;
 
-let geom, shader, fbo;
+class Camera {
+    constructor() {
+        this.lum = new Texture('EXOKIT_LUMINANCE');
+        this.chroma = new Texture('EXOKIT_CHROMA');
+        this.lum.dynamic = this.chroma.dynamic = true;
 
-function init() {
-    geom = new PlaneGeometry(2, 2);
-    shader = new Shader(vs, fs);
-    fbo = new FBO(screen.width * window.devicePixelRatio, screen.height * window.devicePixelRatio);
+        this.renderer = new Renderer();
+        this.geom = new PlaneGeometry(2, 2);
+        this.shader = new Shader(vs, fs);
+        this.fbo = new FBO(screen.width * window.devicePixelRatio, screen.height * window.devicePixelRatio);
 
-    window.addEventListener('resize', _ => {
-        fbo.setSize(screen.width * window.devicePixelRatio, screen.height * window.devicePixelRatio);
-    });
+        const _this = this;
+        window.addEventListener('resize', _ => {
+            _this.fbo.setSize(screen.width * window.devicePixelRatio, screen.height * window.devicePixelRatio);
+        });
+    }
+
+    get texture() {
+        return this.fbo.texture;
+    }
+
+    draw() {
+        this.fbo.bind();
+        this.renderer.draw(this.shader, this.geom);
+        this.fbo.unbind();
+    }
 }
 
-function draw() {
-    fbo.bind();
-    renderer.draw(shader, geom);
-    fbo.unbind();
-}
-
-function getFBO() {
-    return fbo;
-}
-
-exports = {
-    draw,
-    init,
-    getFBO
-}
+exports = {Camera};
