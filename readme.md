@@ -61,7 +61,7 @@ A general purpose event emitter.
 + `timeout: number`. Integer value in seconds.
 + `readyState: number`. Integer value. ReadOnly.
 + `contentLength: number`.
-+ `url: string`. URL requested.
++ `responseURL: string`. URL requested.
 + `response: string|json|arraybuffer`
 + `responseType: string`. "json", "text", "arraybuffer"
 

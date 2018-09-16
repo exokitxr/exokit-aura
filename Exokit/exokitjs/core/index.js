@@ -51,15 +51,13 @@ xhr.addEventListener("readystatechange", function(e) {
      console.log("xhr readystate= "+e.target.readyState+"  "+e.toString());
      if ( e.target.readyState===4 ) {
          var ab= e.target.response;
-         console.log("array buffer length= " + ab.byteLength);
+         console.log("array buffer length= " + ab.width + " " + ab.height + " " + ab.textureId);
          
-         var ta = new Int8Array(ab);
-         console.log("ret[0]= " + ta[0]);
                      
      }
  });
-xhr.open("GET", "http://192.168.32.101:8080/a.json");
-xhr.responseType = "arraybuffer";
+xhr.open("GET", "http://192.168.32.101:8080/a.png");
+xhr.responseType = "texture";
 xhr.send();
 
 garbageCollect()
