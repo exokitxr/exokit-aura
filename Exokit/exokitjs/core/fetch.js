@@ -22,6 +22,7 @@ window.fetch = function(url, options = {}) {
     request.addEventListener('readystatechange', e => {
         if (e.target.readyState === 4) {
             promise.resolve(response());
+            request = null;
         } else if (e.target.readyState !== 1) {
             promise.reject();
         }
@@ -50,7 +51,7 @@ window.fetch = function(url, options = {}) {
             text: () => Promise.resolve(request.responseText()),
             json: () => Promise.resolve(request.responseText()).then(JSON.parse),
             xml: () => Promise.resolve(request.responseXML()),
-            blob: () => Promise.resolve(new Blob([request.response])),
+            // blob: () => Promise.resolve(new Blob([request.response])),
 
             headers: {
                 keys: () => keys,
