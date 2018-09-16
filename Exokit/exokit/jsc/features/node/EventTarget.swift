@@ -33,7 +33,7 @@ class EventTarget : NSObject, JSEventTarget {
     
     func addEventListener(_ forEvent: String, _ callback: JSValue ) -> Void {
         
-        guard callback.isNull || callback.isUndefined else {
+        if callback.isNull || callback.isUndefined {
             JSContext.current().exception = JSValue(newErrorFromMessage: "addEventListener with wrong callback.", in: JSContext.current())
             return
         }
@@ -49,7 +49,7 @@ class EventTarget : NSObject, JSEventTarget {
     }
 
     func removeEventListener(_ forEvent: String, _ callback: JSValue ) -> Void {
-        guard callback.isNull || callback.isUndefined else {
+        if callback.isNull || callback.isUndefined {
             return
         }
 
@@ -69,7 +69,7 @@ class EventTarget : NSObject, JSEventTarget {
 
     func dispatchEvent(_ vevent: JSValue) {
         
-        guard vevent.isNull || vevent.isUndefined else {
+        if vevent.isNull || vevent.isUndefined {
             return
         }
         
