@@ -20,4 +20,5 @@ extension UnsafeMutableRawPointer {
     func releasePointer() {
         let _ = Unmanaged<AnyObject>.fromOpaque(self).takeRetainedValue()
     }
+    
 }
