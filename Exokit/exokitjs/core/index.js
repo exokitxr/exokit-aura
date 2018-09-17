@@ -4,7 +4,11 @@ const gl = require('./gl');
 const dom = require('./dom');
 const worker = require('./worker');
 const xr = require('./xr');
-const f = require('./fetch');
+
+require('./fetch');
+require('./image');
+
+gl.initialize(_gl);
 
 setTimeout(_ => xr.init(), 1000);
 
@@ -24,7 +28,7 @@ EXOKIT.onDrawFrame = function(stage) {
 
 EXOKIT.onload = function() {
     if (EXOKIT.rootPath.charAt(EXOKIT.rootPath.length-1) != '/') EXOKIT.rootPath += '/';
-    parse(fs.readFileSync(EXOKIT.rootPath));
+    // parse(fs.readFileSync(EXOKIT.rootPath));
     window.fireEvent('load');
     window.onload && window.onload();
 };

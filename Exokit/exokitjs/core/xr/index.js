@@ -6,38 +6,9 @@ var _camera;
 let renderer = new Renderer();
 let rotation = new Euler();
 let cameraGroup = new Group();
-let nullGroup = new Group();
 let quaternion = new Quaternion();
 let euler = new Euler();
 let camera = new PerspectiveCamera(35, 1, 0.1, 1000);
-
-nullGroup.add(cameraGroup);
-
-let vs = `#version 300 es
-precision highp float;
-precision highp int;
-in vec3 position;
-in vec2 uv;
-out vec2 vUv;
-
-void main() {
-    vUv = uv;
-    gl_Position = vec4(position, 1.0);
-}
-`;
-
-let fs = `#version 300 es
-precision highp float;
-precision highp int;
-in vec2 vUv;
-out vec4 FragColor;
-
-uniform sampler2D tMap;
-
-void main() {
-    FragColor = texture(tMap, vUv);
-}
-`;
 
 function radians(degrees) {
     return degrees * (Math.PI / 180);
@@ -57,26 +28,18 @@ EXOKIT_AR.setTrackingOrientation = function(orientation) {
     quaternion.setFromEuler(euler);
 };
 
+EXOKIT_AR.setProjectionMatrix = _ => {};
+
 EXOKIT_AR.setRotation = function(value) {
     rotation.fromArray(value);
 };
 
 EXOKIT_AR.setTransform = function(value) {
-    cameraGroup.matrixWorld.fromArray(value);
-    cameraGroup.matrixWorld.decompose(cameraGroup.position, cameraGroup.quaternion, cameraGroup.scale);
-
-    nullGroup.updateMatrix();
-    nullGroup.updateMatrixWorld();
-
-    cameraGroup.matrixWorld.decompose(camera.position, camera.quaternion, camera.scale);
+    camera.matrixWorld.fromArray(value);
+    camera.matrixWorld.decompose(camera.position, camera.quaternion, camera.scale);
     camera.quaternion.multiply(quaternion);
-
     camera.updateMatrixWorld();
-};
-
-EXOKIT_AR.setProjectionMatrix = function(value) {
-    camera.projectionMatrix.fromArray(value);
-    camera.fov = Math.atan(1 / value[5]) * 2 * (180 / Math.PI);
+    EXOKIT_AR.onUpdatePose && EXOKIT_AR.onUpdatePose(camera);
 };
 
 EXOKIT_AR.setLightIntensity = function() {
@@ -87,6 +50,17 @@ EXOKIT_AR.setTrackingState = function() {
 
 };
 
+require('./api');
+
+function blit(from, to) {
+    let gl = _gl;
+    gl.bindFramebuffer(gl.READ_FRAMEBUFFER, from._gl);
+    gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, to ? to._gl : null);
+    gl.blitFramebuffer(0, 0, from.width, from.height, 0, 0, to ? to.width : _camera.fbo.width, to ? to.height : _camera.fbo.height, gl.COLOR_BUFFER_BIT, gl.LINEAR);
+    gl.bindFramebuffer(gl.READ_FRAMEBUFFER, null);
+    gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null);
+}
+
 function init() {
     _camera = new Camera();
 
@@ -94,20 +68,16 @@ function init() {
 
     };
 
-    let geom = new PlaneGeometry(2, 2);
-    let shader = new Shader(vs, fs, {
-        tMap: {type: 't', value: _camera.texture}
-    });
-
     EXOKIT.animationFrame = function() {
-        // console.log('draw');
+        if (!EXOKIT_AR.FBO) return;
         _camera.draw();
-        renderer.draw(shader, geom);
+
+        blit(_camera.fbo, EXOKIT_AR.FBO);
+        EXOKIT_AR.onAnimationFrame && EXOKIT_AR.onAnimationFrame();
+        blit(EXOKI_AR.FBO, null);
     }
 
     ARInterface.create();
-
-    renderer.draw(shader, geom);
 }
 
 exports = {

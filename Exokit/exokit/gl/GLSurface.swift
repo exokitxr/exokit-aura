@@ -221,7 +221,8 @@ class GLSurface: GLKViewController {
         _bindVertexArray()
         deleteVertexArray()
         drawBuffers()
-        _getString();
+        _getString()
+        blitFramebuffer()
     }
     
     fileprivate func _getImageDimensions() {
@@ -1415,6 +1416,13 @@ class GLSurface: GLKViewController {
             glDrawBuffers(GLsizei(count), enums);
         }
         _gl.setObject(unsafeBitCast(fn, to: AnyObject.self), forKeyedSubscript: "drawBuffers" as NSString)
+    }
+    
+    fileprivate func blitFramebuffer() {
+        let fn: @convention(block) (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int) -> Void = { x0, y0, w0, h0, x1, y1, w1, h1, target, type in
+            glBlitFramebuffer(GLint(x0), GLint(y0), GLint(w0), GLint(h0), GLint(x1), GLint(y1), GLint(w0), GLint(h0), GLbitfield(target), GLenum(type));
+        }
+        _gl.setObject(unsafeBitCast(fn, to: AnyObject.self), forKeyedSubscript: "blitFramebuffer" as NSString)
     }
     
     fileprivate func _getString() {

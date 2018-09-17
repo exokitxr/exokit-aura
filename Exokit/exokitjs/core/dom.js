@@ -70,19 +70,3 @@ let events = new EventEmitter();
 window.addEventListener = events.addEventListener;
 window.removeEventListener = events.removeEventListener;
 window.fireEvent = window.dispatchEvent = events.fireEvent;
-
-window.Image = function() { };
-Image.prototype = {
-	set src (val) {
-		this._src = val;
-		var dim = _gl._getImageDimensions(val);
-		this.width = dim[0];
-		this.height = dim[1];
-		this.complete = true;
-        let _this = this;
-        setTimeout(() => _this.onload && _this.onload(), 10);
-	},
-	get src() {
-		return this._src;
-	}
-};

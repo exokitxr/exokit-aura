@@ -341,6 +341,8 @@ class GLPropertyBindings {
         gl.setValue(GL_DRAW_BUFFER13, forProperty: "DRAW_BUFFER13");
         gl.setValue(GL_DRAW_BUFFER14, forProperty: "DRAW_BUFFER14");
         gl.setValue(GL_DRAW_BUFFER15, forProperty: "DRAW_BUFFER15");
+        gl.setValue(GL_READ_FRAMEBUFFER, forProperty: "READ_FRAMEBUFFER");
+        gl.setValue(GL_DRAW_FRAMEBUFFER, forProperty: "DRAW_FRAMEBUFFER");
         gl.setValue(0x9241, forProperty: "UNPACK_PREMULTIPLY_ALPHA_WEBGL");
         gl.setValue(0x9242, forProperty: "CONTEXT_LOST_WEBGL");
         gl.setValue(0x9243, forProperty: "UNPACK_COLORSPACE_CONVERSION_WEBGL");
