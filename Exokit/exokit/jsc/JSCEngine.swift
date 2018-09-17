@@ -90,20 +90,35 @@ class JSCEngine {
         
         // initialize utils.
         let processImageFromArrayBuffer : @convention(block) (JSValue, JSValue, JSValue) -> [String: Any] = { arraybuffer, flip, premultipliedAlpha in
-            if arraybuffer.isNull || arraybuffer.isUndefined {
-                arraybuffer.context.exception =
-                    JSValue(
-                        jsValueRef: JSCUtils.Exception(
-                            arraybuffer.context.jsGlobalContextRef,
-                            "Arraybuffer must not be null."),
-                        in: arraybuffer.context)
-                return [ "width": 0, "height": 0 ]
+            
+            var w = 0, h = 0
+            if let context = arraybuffer.context {
+            
+                if arraybuffer.isNull || arraybuffer.isUndefined {
+                    context.exception =
+                        JSValue(
+                            jsValueRef: JSCUtils.Exception(
+                                context.jsGlobalContextRef,
+                                "Arraybuffer must not be null."),
+                            in: arraybuffer.context)
+                    return [ "width": 0, "height": 0 ]
+                }
+                
+                let ptr = JSObjectGetArrayBufferBytesPtr(context.jsGlobalContextRef, arraybuffer.jsValueRef, nil)
+                let size = JSObjectGetArrayBufferByteLength(context.jsGlobalContextRef, arraybuffer.jsValueRef, nil)
+                let flipped = flip.toBool()
+                let premultiplied = premultipliedAlpha.toBool()
+                
+                if ptr != nil {
+                    (w,h) = JSCUtils.TextureFromArrayBuffer(ptr!, size, flipped, premultiplied)
+                }
             }
             
-            let flipped = flip.toBool()
-            let premultiplied = premultipliedAlpha.toBool()
+            return [
+                "width": w,
+                "height": h
+            ]
             
-            return JSCUtils.TextureFromArrayBufferJS(arraybuffer.context, arraybuffer.jsValueRef, flipped, premultiplied)
         }
         context.setObject( unsafeBitCast(processImageFromArrayBuffer, to: AnyObject.self), forKeyedSubscript: "processImageFromArrayBuffer" as NSString)
     }

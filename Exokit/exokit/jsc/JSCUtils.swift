@@ -19,7 +19,7 @@ class ImageInfo {
         self.width = width
         self.height = height
         
-        contents = UnsafeMutableRawPointer.allocate(byteCount: bytesLength(), alignment: 1)
+        contents = UnsafeMutableRawPointer.allocate(byteCount: width*height*4, alignment: 1)
     }
     
     deinit {
@@ -74,25 +74,7 @@ struct JSCUtils {
 
         return JSObjectMakeError(context, 1, UnsafePointer(args), nil);
     }
-    
-    // Create a texture from a file contents.
-    // It will set bound texture's pixels with image resulting from decoding arraybuffer contents.
-    static func TextureFromArrayBufferJS(_ context: JSContext, _ arraybuffer: JSContextRef, _ flipped: Bool, _ premultipliedAlpha: Bool ) -> [String: Any] {
         
-        let ptr = JSObjectGetArrayBufferBytesPtr(context.jsGlobalContextRef, arraybuffer, nil)
-        let size = JSObjectGetArrayBufferByteLength(context.jsGlobalContextRef, arraybuffer, nil)
-        
-        var w = 0, h = 0
-        if ptr != nil {
-            (w,h) = TextureFromArrayBuffer(ptr!, size, flipped, premultipliedAlpha)
-        }
-        
-        return [
-            "width": w,
-            "height": h
-        ]
-    }
-    
     static func TextureFromArrayBuffer(_ ptr: UnsafeMutableRawPointer, _ size: Int, _ flipped: Bool, _ premultipliedAlpha: Bool ) -> (Int, Int) {
         
         let data = Data(bytesNoCopy: ptr, count: size, deallocator: .none)
