@@ -89,6 +89,7 @@ class GLSurface: GLKViewController {
     fileprivate func bindFunctions() {
         _getImageDimensions()
         _texImage2DShort()
+        _texImage2DShortArrayBuffer()
         _texImage2DLong()
         _bindBuffer()
         _bindFramebuffer()
@@ -254,6 +255,33 @@ class GLSurface: GLKViewController {
             }
         }
         _gl.setObject(unsafeBitCast(fn, to: AnyObject.self), forKeyedSubscript: "_texImage2DShort" as NSString)
+    }
+    
+    fileprivate func _texImage2DShortArrayBuffer() {
+        let fn: @convention(block) (Int, Int, Int, Int, Int, JSValue) -> Void = { target, level, intfr, format, type, arraybuffer in
+            if let context = arraybuffer.context {
+                if arraybuffer.isNull || arraybuffer.isUndefined {
+                    context.exception =
+                        JSValue(
+                            jsValueRef: JSCUtils.Exception(
+                                context.jsGlobalContextRef,
+                                "Arraybuffer must not be null."),
+                            in: arraybuffer.context)
+                    return
+                }
+                
+                let ptr = JSObjectGetArrayBufferBytesPtr(context.jsGlobalContextRef, arraybuffer.jsValueRef, nil)
+                let size = JSObjectGetArrayBufferByteLength(context.jsGlobalContextRef, arraybuffer.jsValueRef, nil)
+                let flipped = true
+                let premultiplied = true
+                
+                if ptr != nil {
+                    let (width, height, textureData) = JSCUtils.TextureFromArrayBuffer(ptr!, size, flipped, premultiplied)
+                    glTexImage2D(GLenum(target), GLint(level), GLint(intfr), GLsizei(width), GLsizei(height), 0, GLenum(format), GLenum(type), textureData)
+                }
+            }
+        }
+        _gl.setObject(unsafeBitCast(fn, to: AnyObject.self), forKeyedSubscript: "_texImage2DShortArrayBuffer" as NSString)
     }
     
     fileprivate func getBytesPerPixel(type: Int, format: Int) -> Int {

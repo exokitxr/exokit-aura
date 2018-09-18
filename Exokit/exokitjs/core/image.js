@@ -7,15 +7,17 @@ class Image {
         let xhr = XMLHttpRequest.create();
         xhr.addEventListener('readystatechange', e => {
             if (e.target.readyState === 4) {
-                let data = xhr.response;
-                _this.width = data.width;
-                _this.height = data.height;
+                let r = e.target.response;
+                let v = getDimensionsFromArrayBuffer(r);
+                _this.width = v.width;
+                _this.height = v.height;
                 _this.onload && _this.onload();
+                _this._arraybuffer = r;
             }
         });
 
         xhr.open('GET', url);
-        xhr.responseType = 'texture';
+        xhr.responseType = 'arraybuffer';
         xhr.send();
     }
 
@@ -25,6 +27,3 @@ class Image {
 }
 
 window.Image = Image;
-
-// let img = new Image();
-// img.src = 'http://192.168.1.5/blank/html/assets/images/_scenelayout/uv.jpg';

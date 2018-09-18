@@ -75,7 +75,7 @@ struct JSCUtils {
         return JSObjectMakeError(context, 1, UnsafePointer(args), nil);
     }
         
-    static func TextureFromArrayBuffer(_ ptr: UnsafeMutableRawPointer, _ size: Int, _ flipped: Bool, _ premultipliedAlpha: Bool ) -> (Int, Int) {
+    static func TextureFromArrayBuffer(_ ptr: UnsafeMutableRawPointer, _ size: Int, _ flipped: Bool, _ premultipliedAlpha: Bool ) -> (Int, Int, UnsafeMutableRawPointer) {
         
         let data = Data(bytesNoCopy: ptr, count: size, deallocator: .none)
         if let uiimage = UIImage.init(data: data) {
@@ -113,12 +113,25 @@ struct JSCUtils {
                 
                 context.draw(imageRef, in: CGRect(x: CGFloat(0), y: CGFloat(0), width: CGFloat(width), height: CGFloat(height)))
                 
-                // set texture pixels
-                glTexImage2D(GLenum(GL_TEXTURE_2D), 0, GL_RGBA, GLsizei(imageRef.width), GLsizei(imageRef.height), 0, GLenum(GL_RGBA), GLenum(GL_UNSIGNED_BYTE), textureData)
-                
-                return (width, height)
+                return (width, height, textureData)
                 
             }
+        }
+        
+        let emptyData = [GLubyte](repeating: 0, count:4)
+        return (0,0, UnsafeMutableRawPointer(mutating: emptyData))
+    }
+    
+    static func TextureDimensions(_ ptr: UnsafeMutableRawPointer, _ size: Int) -> (Int, Int) {
+        
+        let data = Data(bytesNoCopy: ptr, count: size, deallocator: .none)
+        if let uiimage = UIImage.init(data: data) {
+    
+            let imageRef = uiimage.cgImage!
+            let width = imageRef.width
+            let height = imageRef.height
+            return (width, height)
+            
         }
         
         return (0,0)

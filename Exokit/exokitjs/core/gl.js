@@ -58,14 +58,24 @@ function initialize(_gl) {
         if (p6) {
             img = p8 || EXOKIT._img;
             if (p8 && p8.buffer) {
-                if (p8 instanceof Int32Array) img = {intArray: p8};
-                else img = {floatArray: p8};
+                if (p8 instanceof Float32Array) img = {floatArray: p8};
+                else img = {intArray: p8};
             }
-            _gl._texImage2DLong(p0, p1, p2, p3, p4, p5, p6, p7, img);
+
+            if (img._arraybuffer) {
+                _gl._texImage2DLongArrayBuffer(p0, p1, p2, p3, p4, p5, p6, p7, img._arraybuffer);
+            } else {
+                // _gl._texImage2DLong(p0, p1, p2, p3, p4, p5, p6, p7, img);
+            }
         } else {
             img = p5 || EXOKIT._img;
             if (!img._src) return;
-            _gl._texImage2DShort(p0, p1, p2, p3, p4, img);
+
+            if (img._arraybuffer) {
+                _gl._texImage2DShortArrayBuffer(p0, p1, p2, p3, p4, img._arraybuffer);
+            } else {
+                _gl._texImage2DShort(p0, p1, p2, p3, p4, img);
+            }
         }
     };
     //

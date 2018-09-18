@@ -89,7 +89,7 @@ class JSCEngine {
         context.setObject(XHR.self, forKeyedSubscript: "XMLHttpRequest" as NSString)
         
         // initialize utils.
-        let processImageFromArrayBuffer : @convention(block) (JSValue, JSValue, JSValue) -> [String: Any] = { arraybuffer, flip, premultipliedAlpha in
+        let getDimensionsFromArrayBuffer : @convention(block) (JSValue) -> [String: Any] = { arraybuffer in
             
             var w = 0, h = 0
             if let context = arraybuffer.context {
@@ -106,11 +106,9 @@ class JSCEngine {
                 
                 let ptr = JSObjectGetArrayBufferBytesPtr(context.jsGlobalContextRef, arraybuffer.jsValueRef, nil)
                 let size = JSObjectGetArrayBufferByteLength(context.jsGlobalContextRef, arraybuffer.jsValueRef, nil)
-                let flipped = flip.toBool()
-                let premultiplied = premultipliedAlpha.toBool()
                 
                 if ptr != nil {
-                    (w,h) = JSCUtils.TextureFromArrayBuffer(ptr!, size, flipped, premultiplied)
+                    (w,h) = JSCUtils.TextureDimensions(ptr!, size)
                 }
             }
             
@@ -120,7 +118,7 @@ class JSCEngine {
             ]
             
         }
-        context.setObject( unsafeBitCast(processImageFromArrayBuffer, to: AnyObject.self), forKeyedSubscript: "processImageFromArrayBuffer" as NSString)
+        context.setObject( unsafeBitCast(getDimensionsFromArrayBuffer, to: AnyObject.self), forKeyedSubscript: "getDimensionsFromArrayBuffer" as NSString)
     }
     
     fileprivate func initEngine() {
