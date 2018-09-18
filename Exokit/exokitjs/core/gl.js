@@ -72,7 +72,7 @@ function initialize(_gl) {
         //     if (!img._src) return;
         //
         //     if (img._arraybuffer) {
-                _gl._texImage2DShortArrayBuffer(p0, p1, p2, p3, p4, img._arraybuffer);
+                _gl._texImage2DShortArrayBuffer(p0, p1, p2, p3, p4, p5._arraybuffer);
             // } else {
             //     _gl._texImage2DShort(p0, p1, p2, p3, p4, img);
             // }
