@@ -14,7 +14,7 @@ EXOKIT.tick = _ => {
 
 EXOKIT.init = path => {
     if (EXOKIT.rootPath.charAt(EXOKIT.rootPath.length-1) != '/') EXOKIT.rootPath += '/';
-    EXOKIT.evaluate(fs.readFileSync(EXOKIT.rootPath + path));
+    EXOKIT.evaluate(fs.readFileSync(EXOKIT.rootPath + path), path);
 };
 
 const _getArrayType = function(array) {
@@ -44,6 +44,6 @@ self.postMessage = function(msg, buffer) {
 
 self.importScripts = function() {
     for (let i = 0; i < arguments.length; i++) {
-        EXOKIT.evaluate(fs.readFileSync(EXOKIT.rootPath + arguments[i]));
+        EXOKIT.evaluate(fs.readFileSync(EXOKIT.rootPath + arguments[i]), arguments[i]);
     }
 };

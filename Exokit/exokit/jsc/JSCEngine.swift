@@ -140,14 +140,14 @@ class JSCEngine {
         
         let exokitImport: @convention(block) (String) -> Void = { path in
             let url = Utils.loadJS(name: path)
-            self.context.evaluateScript(url, withSourceURL: URL(string: url)!);
+            self.context.evaluateScript(url, withSourceURL: URL(string: path)!);
         }
         let exokit = context.objectForKeyedSubscript("EXOKIT");
         exokit?.setObject(unsafeBitCast(exokitImport, to: AnyObject.self), forKeyedSubscript: "import" as NSString)
         exokit?.setObject(Bundle.main.infoDictionary!["EXOKIT_URL"] as! String, forKeyedSubscript: "rootPath" as NSString)
         
-        let exokitEvaluate: @convention(block) (String) -> Void = { code in
-            self.context.evaluateScript(code, withSourceURL: URL(string:"imported"));
+        let exokitEvaluate: @convention(block) (String, String) -> Void = { code, file in
+            self.context.evaluateScript(code, withSourceURL: URL(string: file));
         }
         exokit?.setObject(unsafeBitCast(exokitEvaluate, to: AnyObject.self), forKeyedSubscript: "evaluate" as NSString)
         exokit?.setValue(ProcessInfo.processInfo.processorCount, forProperty: "processorCount");

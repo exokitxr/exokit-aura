@@ -31,7 +31,7 @@ class JSCWorker {
         context.setObject(EventTarget.self, forKeyedSubscript: "EventTarget" as NSString)
         context.setObject(XHR.self, forKeyedSubscript: "XMLHttpRequest" as NSString)
         
-        context.evaluateScript(Utils.loadInternalJS(name: "engine"));
+        context.evaluateScript(Utils.loadInternalJS(name: "engine"), withSourceURL: URL(string: "engine")!);
         EXOKIT = context.objectForKeyedSubscript("EXOKIT");
         requireUtil = Require()
         let requireCallback: @convention(block) (String) -> AnyObject = { input in
@@ -49,7 +49,7 @@ class JSCWorker {
         requireUtil?.setResolve(resource: "exokitjs/core", ofType: "")
         let exokitjsCorePath = requireUtil?.currentRequireContext() ?? ""
         if let jstxt = try? String(contentsOfFile: "\(exokitjsCorePath)/worker-thread.js") {
-            context.evaluateScript(jstxt)
+            context.evaluateScript(jstxt, withSourceURL: URL(string: "\(exokitjsCorePath)/worker-thread.js")!)
         }
 
         initCommunication();
@@ -60,8 +60,8 @@ class JSCWorker {
     }
     
     fileprivate func initCommunication() {
-        let evaluate: @convention(block) (String) -> Void = { code in
-            self.context.evaluateScript(code);
+        let evaluate: @convention(block) (String, String) -> Void = { code, path in
+            self.context.evaluateScript(code, withSourceURL: URL(string: path));
         }
         EXOKIT.setObject(unsafeBitCast(evaluate, to: AnyObject.self), forKeyedSubscript: "evaluate" as NSString)
         

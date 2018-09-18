@@ -60,7 +60,7 @@ function createElement() {
     el.appendChild = function(child) {
         if (child.script) {
             let code = fs.readFileSync(EXOKIT.rootPath + child.src);
-            EXOKIT.evaluate(code);
+            EXOKIT.evaluate(code, child.src);
         }
     };
 
