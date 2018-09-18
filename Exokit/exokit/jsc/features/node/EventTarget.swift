@@ -30,9 +30,10 @@ class EventTarget : NSObject, JSEventTarget {
     deinit {
         for arrcallback in eventListeners.values {
             for callback in arrcallback {
-                JSValueProtect(JSContext.current().jsGlobalContextRef, callback.value.jsValueRef)
+                JSValueUnprotect(callback.value.context.jsGlobalContextRef, callback.value.jsValueRef)
             }
         }
+        eventListeners.removeAll()
     }
     
     class func create() -> Any {

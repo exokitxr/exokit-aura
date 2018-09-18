@@ -33,3 +33,16 @@ EXOKIT.onload = function() {
 window.requestAnimationFrame = function(callback) {
     EXOKIT.animationFrame = callback;
 };
+
+let xhr = XMLHttpRequest.create();
+xhr.addEventListener('readystatechange', e => {
+     if (e.target.readyState === 4) {
+         var r = e.target.response;
+         var v = processImageFromArrayBuffer(r, true, true)
+         console.log("image processed: ("+v.width+ ","+v.height+")");
+     }
+ });
+
+xhr.open('GET', "http://192.168.32.101:8080/a.png");
+xhr.responseType = 'arraybuffer';
+xhr.send();
