@@ -69,8 +69,8 @@ class GLSurface: GLKViewController {
         let bufferSubData = JSObjectMakeFunctionWithCallback(ctx, bufferSubDataName, { ctx, functionObject, thisObject, argc, argv, exception in
             let target = JSValueToNumber(ctx, argv![0], nil);
             let offset = JSValueToNumber(ctx, argv![1], nil);
-            let size = JSValueToNumber(ctx, argv![2], nil);
-            let ptr = JSObjectGetTypedArrayBytesPtr(ctx, argv![3], nil);
+            let ptr = JSObjectGetTypedArrayBytesPtr(ctx, argv![2], nil);
+            let size = JSValueToNumber(ctx, argv![3], nil);
             
             glBufferSubData(GLenum(target), GLintptr(offset), GLsizeiptr(size), ptr)
             return JSValueMakeUndefined(ctx)
@@ -222,6 +222,7 @@ class GLSurface: GLKViewController {
         deleteVertexArray()
         drawBuffers()
         _getString()
+        _getBoolean()
         blitFramebuffer()
     }
     
@@ -1441,6 +1442,16 @@ class GLSurface: GLKViewController {
         }
         _gl.setObject(unsafeBitCast(fn, to: AnyObject.self), forKeyedSubscript: "_getString" as NSString)
     }
+    
+    fileprivate func _getBoolean() {
+        let fn: @convention(block) (Int) -> Bool = { param in
+            var bool = GLboolean();
+            glGetBooleanv(GLenum(param), &bool);
+            return bool == GL_FALSE ? false : true
+        }
+        _gl.setObject(unsafeBitCast(fn, to: AnyObject.self), forKeyedSubscript: "_getBoolean" as NSString)
+    }
+    
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         var str = "";

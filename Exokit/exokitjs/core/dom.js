@@ -50,6 +50,7 @@ window.location = {
 
 window.navigator = {};
 window.navigator.userAgent = 'Exokit iOS';
+window.navigator.platform = 'iOS';
 
 window.history = {};
 

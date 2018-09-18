@@ -98,6 +98,19 @@ void main() {
 }
 `;
 
+let copy = `#version 300 es
+precision highp float;
+precision highp int;
+in vec2 vUv;
+out vec4 FragColor;
+
+uniform sampler2D tMap;
+
+void main() {
+	FragColor = texture(tMap, vUv);
+}
+`;
+
 let landscapeLeft = `#version 300 es
 precision highp float;
 precision highp int;
@@ -184,6 +197,7 @@ void main() {
 
 exports = {
     vs,
+    copy,
     landscapeLeft,
     landscapeRight,
     portrait,

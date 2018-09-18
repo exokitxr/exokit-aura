@@ -15,6 +15,7 @@ class XRDevice {
     requestSession({requestAR}) {
         if (!requestAR) throw 'XR :: Can only use type requestAR';
         let session = new XRSession({device: this});
+        return Promise.resolve(session);
     }
 }
 
@@ -98,18 +99,17 @@ class XRWebGLLayer {
         this.context = context;
         this.scale = options.framebufferScaleFactor || 1;
 
-        this.fbo = new FBO(window.innerWidth * window.devicePixelRatio * this.scale, window.innerheight * window.devicePixelRatio * this.scale);
+        this.fbo = new FBO(window.innerWidth * window.devicePixelRatio * this.scale, window.innerHeight * window.devicePixelRatio * this.scale);
         this.fbo.create(_gl);
         this.framebuffer = this.fbo._gl;
         this.viewport = {x: 0, y: 0, width: this.fbo.width, height: this.fbo.height};
 
         EXOKIT_AR.FBO = this.fbo;
-
-        xr.init();
+        EXOKIT_AR.init();
 
         const _this = this;
         window.addEventListener('resize', _ => {
-            _this.fbo.setSize(window.innerWidth * window.devicePixelRatio * _this.scale, window.innerheight * window.devicePixelRatio * _this.scale);
+            _this.fbo.setSize(window.innerWidth * window.devicePixelRatio * _this.scale, window.innerHeight * window.devicePixelRatio * _this.scale);
             _this.viewport.width = _this.fbo.width;
             _this.viewport.height = _this.fbo.height;
         });
@@ -121,7 +121,7 @@ class XRWebGLLayer {
 
     requestViewportScaling(scale) {
         this.scale = scale;
-        this.fbo.setSize(window.innerWidth * window.devicePixelRatio * this.scale, window.innerheight * window.devicePixelRatio * this.scale);
+        this.fbo.setSize(window.innerWidth * window.devicePixelRatio * this.scale, window.innerHeight * window.devicePixelRatio * this.scale);
         this.viewport.width = this.fbo.width;
         this.viewport.height = this.fbo.height;
     }

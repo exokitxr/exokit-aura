@@ -26,6 +26,7 @@
 		6214202B211776C30082A1DB /* AR.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6214202A211776C30082A1DB /* AR.swift */; };
 		6220CED02144CA8100102137 /* www in Resources */ = {isa = PBXBuildFile; fileRef = 6220CECF2144CA8100102137 /* www */; };
 		624618362145F9D800F1BA35 /* HydraBinding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 624618352145F9D800F1BA35 /* HydraBinding.swift */; };
+		62B65A2F214F769A00831347 /* GLSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 621402672116B93200C8BB32 /* GLSurface.swift */; };
 		62CE1F52214A05BD00B2B3AE /* WorkerBacking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62CE1F51214A05BD00B2B3AE /* WorkerBacking.swift */; };
 		62CE1F54214A05EB00B2B3AE /* JSCWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62CE1F53214A05EB00B2B3AE /* JSCWorker.swift */; };
 		964D09E1214861B2007AD7FC /* EventTarget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 964D09E0214861B2007AD7FC /* EventTarget.swift */; };
@@ -435,6 +436,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				62B65A2F214F769A00831347 /* GLSurface.swift in Sources */,
 				621402432116A84800C8BB32 /* ExokitUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

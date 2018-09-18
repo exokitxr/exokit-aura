@@ -23,7 +23,7 @@ EXOKIT._img = {'_src': '-1'};
       },
 
       warn: function(c, d) {
-        print("WARN :: " + c + " " + d);
+        print("WARN :: " + (typeof c === 'object' ? JSON.stringify(c) : c));
         console.warn(c, d);
       },
 

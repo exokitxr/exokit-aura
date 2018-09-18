@@ -16,6 +16,10 @@ function initialize(_gl) {
             return _gl._getString(param);
             break;
 
+            case _gl.DEPTH_WRITEMASK:
+            return _gl._getBoolean(param);
+            break;
+
             case _gl.VERSION:
             if (_gl.type.includes('2')) return 'WebGL 2.0';
             return 'WebGL 1.0';
@@ -136,6 +140,7 @@ function initialize(_gl) {
     }
 
     _gl.bufferSubData = function(p0, p1, p2, p3) {
+        if (!p3) p3 = p2.length;
         window.C_glBufferSubData(p0, p1, p2, p3);
     }
 }

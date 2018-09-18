@@ -81,7 +81,7 @@ class ARTracking : NSObject, ARSessionDelegate {
             projectionMatrix = frame.camera.projectionMatrix(for: .portrait, viewportSize: UIScreen.main.bounds.size, zNear: 0.01, zFar: 200);
             break;
         }
-        
+                
         float3ToDouble(origin: frame.camera.eulerAngles, destination: &_rotation)
         matrixToDouble(origin: projectionMatrix, destination: &_projectionMatrix)
         matrixToDouble(origin: frame.camera.transform, destination: &_transform)

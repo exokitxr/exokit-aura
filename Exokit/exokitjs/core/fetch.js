@@ -22,10 +22,8 @@ window.fetch = function(url, options = {}) {
     request.addEventListener('readystatechange', e => {
         if (e.target.readyState === 4) {
             promise.resolve(response());
-            request = promise = null;
         } else if (e.target.readyState !== 1) {
             promise.reject();
-            request = promise = null;
         }
     });
 
@@ -43,7 +41,7 @@ window.fetch = function(url, options = {}) {
         });
 
         return {
-            ok: (request.status/200|0) == 1,		// 200-399
+            ok: true,
             status: request.status,
             statusText: request.statusText,
             url: request.url,

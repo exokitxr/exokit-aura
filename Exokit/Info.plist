@@ -19,7 +19,7 @@
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>EXOKIT_URL</key>
-	<string>http://192.168.1.5/blank/html</string>
+	<string>http://192.168.1.5/xrexperiments/html</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>

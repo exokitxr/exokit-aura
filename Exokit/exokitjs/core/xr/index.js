@@ -1,5 +1,6 @@
 const {PlaneGeometry, Renderer, Shader, FBO, Matrix4, Vector3, Vector2, Quaternion, Euler, Group, PerspectiveCamera} = require('exokitgl');
 const {Camera} = require('./camera');
+const shaders = require('./camera-shaders');
 
 var _camera;
 
@@ -61,7 +62,22 @@ function blit(from, to) {
     gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null);
 }
 
-function init() {
+let copyShader, copyGeom;
+function drawCameraToFBO() {
+    if (!copyShader) {
+        copyShader = new Shader(shaders.vs, shaders.copy, {
+            tMap: {type: 't', value: _camera.texture}
+        });
+        copyGeom = new PlaneGeometry(2, 2);
+    }
+
+    _gl.bindFramebuffer(_gl.FRAMEBUFFER, EXOKIT_AR.FBO._gl);
+    renderer.draw(copyShader, copyGeom);
+    _gl.clear(_gl.DEPTH_BUFFER_BIT);
+    _gl.bindFramebuffer(_gl.FRAMEBUFFER, null);
+}
+
+EXOKIT_AR.init = function() {
     _camera = new Camera();
 
     window.requestAnimationFrame = function() {
@@ -71,15 +87,10 @@ function init() {
     EXOKIT.animationFrame = function() {
         if (!EXOKIT_AR.FBO) return;
         _camera.draw();
-
-        blit(_camera.fbo, EXOKIT_AR.FBO);
+        drawCameraToFBO();
         EXOKIT_AR.onAnimationFrame && EXOKIT_AR.onAnimationFrame();
-        blit(EXOKI_AR.FBO, null);
+        blit(EXOKIT_AR.FBO, null);
     }
 
-    ARInterface.create();
-}
-
-exports = {
-    init
+    EXOKIT_AR.interface = ARInterface.create();
 }
