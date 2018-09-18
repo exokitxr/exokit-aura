@@ -87,6 +87,40 @@ class JSCEngine {
         context.setObject(Event.self, forKeyedSubscript: "Event" as NSString)
         context.setObject(EventTarget.self, forKeyedSubscript: "EventTarget" as NSString)
         context.setObject(XHR.self, forKeyedSubscript: "XMLHttpRequest" as NSString)
+        
+        // initialize utils.
+        let processImageFromArrayBuffer : @convention(block) (JSValue, JSValue, JSValue) -> [String: Any] = { arraybuffer, flip, premultipliedAlpha in
+            
+            var w = 0, h = 0
+            if let context = arraybuffer.context {
+            
+                if arraybuffer.isNull || arraybuffer.isUndefined {
+                    context.exception =
+                        JSValue(
+                            jsValueRef: JSCUtils.Exception(
+                                context.jsGlobalContextRef,
+                                "Arraybuffer must not be null."),
+                            in: arraybuffer.context)
+                    return [ "width": 0, "height": 0 ]
+                }
+                
+                let ptr = JSObjectGetArrayBufferBytesPtr(context.jsGlobalContextRef, arraybuffer.jsValueRef, nil)
+                let size = JSObjectGetArrayBufferByteLength(context.jsGlobalContextRef, arraybuffer.jsValueRef, nil)
+                let flipped = flip.toBool()
+                let premultiplied = premultipliedAlpha.toBool()
+                
+                if ptr != nil {
+                    (w,h) = JSCUtils.TextureFromArrayBuffer(ptr!, size, flipped, premultiplied)
+                }
+            }
+            
+            return [
+                "width": w,
+                "height": h
+            ]
+            
+        }
+        context.setObject( unsafeBitCast(processImageFromArrayBuffer, to: AnyObject.self), forKeyedSubscript: "processImageFromArrayBuffer" as NSString)
     }
     
     fileprivate func initEngine() {

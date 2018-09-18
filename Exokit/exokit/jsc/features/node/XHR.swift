@@ -251,10 +251,8 @@ class XHR : EventTarget, JSXHR {
             return getAsJSON()
         } else if responseType == "arraybuffer" {
             return getAsArrayBuffer()
-        } else if responseType == "texture" {
-            return getAsTexture()
         }
-        
+
         return nil
     }
     
@@ -281,72 +279,4 @@ class XHR : EventTarget, JSXHR {
         
         return ret
     }
-    
-    fileprivate func getAsTexture() -> [String:UInt] {
-        
-        guard contents != nil else {
-            return [:]
-        }
-        
-        // allocate a pointer to hold contents
-        let ptr: UnsafeMutableBufferPointer<UInt8> = UnsafeMutableBufferPointer<UInt8>.allocate(capacity: contents!.count)
-        
-        // copy Data into ptr
-        contents?.withUnsafeBytes { (contentsPtr: UnsafePointer<UInt8>) -> Void in
-            let _ = ptr.initialize(from: UnsafeBufferPointer(start: contentsPtr, count: contents!.count))
-        }
-        
-        if let uiimage = UIImage.init(data: contents!) {
-            
-            let imageRef = uiimage.cgImage!
-        
-            let width = imageRef.width
-            let height = imageRef.height
-            let spriteData = [GLubyte](repeating: 0, count: width*height*4)
-            let textureData = UnsafeMutableRawPointer(mutating: spriteData)
-            let colorSpace = CGColorSpaceCreateDeviceRGB()
-            let bytesPerPixel = 4
-            let bytesPerRow = bytesPerPixel * imageRef.width
-            let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue)
-            
-            guard let context = CGContext(
-                data: textureData,
-                width: imageRef.width,
-                height: imageRef.height,
-                bitsPerComponent: 8,
-                bytesPerRow: bytesPerRow,
-                space: colorSpace,
-                bitmapInfo: bitmapInfo.rawValue) else {
-                    return [:]
-            }
-            
-            // draw the image inverted ?? hope so.
-            context.translateBy(x: 0, y: CGFloat(height))
-            context.scaleBy(x: 1, y: -1)
-            context.draw(imageRef, in: CGRect(x: CGFloat(0), y: CGFloat(0), width: CGFloat(width), height: CGFloat(height)))
-            
-            var currentTexture: GLint = 0
-            glGetIntegerv(GLenum(GL_TEXTURE_BINDING_2D), &currentTexture )
-            
-            var textureId: GLuint = 0
-            glGenTextures(GLsizei(1), &textureId)
-            glBindTexture(GLenum(GL_TEXTURE_2D), textureId )
-            
-            // set texture pixels
-            glTexImage2D(GLenum(GL_TEXTURE_2D), 0, GL_RGBA, GLsizei(imageRef.width), GLsizei(imageRef.height), 0, GLenum(GL_RGBA), GLenum(GL_UNSIGNED_BYTE), textureData)
-             
-            if -1 != currentTexture {
-                glBindTexture(GLenum(GL_TEXTURE_2D), GLuint(currentTexture) )
-            }
-            
-            return [
-                "textureId" : UInt(textureId),
-                "width" : UInt(width),
-                "height" : UInt(height)
-            ]
-        }
-        
-        return [:]
-    }
-    
 }
