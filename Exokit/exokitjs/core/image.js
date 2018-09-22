@@ -2,6 +2,7 @@ class Image {
     constructor() {
         this.flipped = '-1';
         this.premultiply = '-1';
+        this.isImage = true;
     }
 
     set src(url) {

@@ -57,13 +57,14 @@ function initialize(_gl) {
     _gl.texImage2D = function(p0, p1, p2, p3, p4, p5, p6, p7, p8) {
         let info = EXOKIT._img;
         let image = p6 ? p8 : p5;
-        if (image._arraybuffer) {
+        if (image && image.isImage) {
             info.flipped = image.flipped;
             info.premultiply = image.premultiply;
         }
 
         if (p6) {
-            _gl._texImage2DLong(p0, p1, p2, p3, p4, p5, p6, p7, p8.buffer);
+            if (p8) _gl._texImage2DLong(p0, p1, p2, p3, p4, p5, p6, p7, p8.buffer);
+            else _gl._texImage2DNull(p0, p1, p2, p3, p4, p5, p6, p7);
         } else {
             if (!!p5.resource) _gl._texImage2DResource(p5.resource, p0, p1, p2, p3, p4);
             else if (p5.buffer) _gl._texImage2DShort(p0, p1, p2, p3, p4, p5.buffer, info);

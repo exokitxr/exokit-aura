@@ -62,6 +62,8 @@ class GLSurface: GLKViewController {
     fileprivate func bindFunctions() {
         _texImage2DShort()
         _texImage2DLong()
+        _texImage2DResource()
+        _texImage2DNull()
         _bindBuffer()
         _bindFramebuffer()
         _bindRenderbuffer()
@@ -272,6 +274,15 @@ class GLSurface: GLKViewController {
             }
         }
         _gl.setObject(unsafeBitCast(fn, to: AnyObject.self), forKeyedSubscript: "_texImage2DLong" as NSString)
+    }
+    
+    fileprivate func _texImage2DNull() {
+        let fn: @convention(block) (Int, Int, Int, Int, Int, Int, Int, Int) -> Void = { target, level, intfr, width, height, border, format, type in
+            let nulled = calloc(width * height, self.getBytesPerPixel(type: type, format: format));
+            glTexImage2D(GLenum(target), GLint(level), GLint(intfr), GLsizei(width), GLsizei(height), GLint(border), GLenum(format), GLenum(type), nulled)
+            free(nulled)
+        }
+        _gl.setObject(unsafeBitCast(fn, to: AnyObject.self), forKeyedSubscript: "_texImage2DNull" as NSString)
     }
     
     fileprivate func getBytesPerPixel(type: Int, format: Int) -> Int {

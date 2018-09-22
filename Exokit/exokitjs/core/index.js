@@ -1,5 +1,6 @@
 const parse = require('scriptparser');
 const fs = require('fs');
+const Url = require('url-parse');
 const gl = require('./gl');
 const dom = require('./dom');
 const worker = require('./worker');
@@ -15,7 +16,6 @@ EXOKIT.onDrawFrame = function(stage) {
     if (EXOKIT.prevStage) {
         if (stage.width != EXOKIT.prevStage.width || stage.height != EXOKIT.prevStage.height) {
             window.fireEvent('resize');
-            window.onresize && window.onresize();
         }
     }
     EXOKIT.prevStage = stage;
@@ -25,9 +25,15 @@ EXOKIT.onDrawFrame = function(stage) {
 
 EXOKIT.onload = function() {
     if (EXOKIT.rootPath.charAt(EXOKIT.rootPath.length-1) != '/') EXOKIT.rootPath += '/';
+    if (EXOKIT.rootPath.includes('http')) {
+        let url = new Url(EXOKIT.rootPath);
+        for (let key in url) window.location[key] = url[key];
+    } else {
+        window.location.pathname = EXOKIT.rootPath;
+    }
+
     parse(fs.readFileSync(EXOKIT.rootPath));
     window.fireEvent('load');
-    window.onload && window.onload();
 };
 
 window.requestAnimationFrame = function(callback) {

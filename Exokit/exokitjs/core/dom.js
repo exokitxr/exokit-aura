@@ -42,9 +42,10 @@ window.document.getElementById = document.createElement;
 window.location = {
     hash: '',
     search: '',
-    href: 'EXOKIT',
-    hostname: 'EXOKIT',
+    href: '',
+    hostname: '',
     pathname: '',
+    port: '',
     reload: function() {}
 }
 
