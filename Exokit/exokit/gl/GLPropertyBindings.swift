@@ -3,6 +3,9 @@ import JavaScriptCore
 import OpenGLES
 
 class GLPropertyBindings {
+    var UNPACK_FLIP_Y_WEBGL = 1;
+    var UNPACK_PREMULTIPLY_ALPHA_WEBGL = 2;
+    
     init(gl: JSValue!) {
         gl.setValue(GL_DEPTH_BUFFER_BIT, forProperty: "DEPTH_BUFFER_BIT");
         gl.setValue(GL_STENCIL_BUFFER_BIT, forProperty: "STENCIL_BUFFER_BIT");
@@ -317,7 +320,7 @@ class GLPropertyBindings {
         gl.setValue(GL_RENDERBUFFER_BINDING, forProperty: "RENDERBUFFER_BINDING");
         gl.setValue(GL_MAX_RENDERBUFFER_SIZE, forProperty: "MAX_RENDERBUFFER_SIZE");
         gl.setValue(GL_INVALID_FRAMEBUFFER_OPERATION, forProperty: "INVALID_FRAMEBUFFER_OPERATION");
-        gl.setValue(GL_UNPACK_ALIGNMENT, forProperty: "UNPACK_FLIP_Y_WEBGL");
+        gl.setValue(UNPACK_FLIP_Y_WEBGL, forProperty: "UNPACK_FLIP_Y_WEBGL");
         gl.setValue(GL_UNSIGNED_INT_24_8_OES, forProperty: "GL_UNSIGNED_INT_24_8_OES");
         gl.setValue(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, forProperty: "GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT");
         gl.setValue(GL_TEXTURE_MAX_ANISOTROPY_EXT, forProperty: "GL_TEXTURE_MAX_ANISOTROPY_EXT");
@@ -343,7 +346,7 @@ class GLPropertyBindings {
         gl.setValue(GL_DRAW_BUFFER15, forProperty: "DRAW_BUFFER15");
         gl.setValue(GL_READ_FRAMEBUFFER, forProperty: "READ_FRAMEBUFFER");
         gl.setValue(GL_DRAW_FRAMEBUFFER, forProperty: "DRAW_FRAMEBUFFER");
-        gl.setValue(0x9241, forProperty: "UNPACK_PREMULTIPLY_ALPHA_WEBGL");
+        gl.setValue(UNPACK_PREMULTIPLY_ALPHA_WEBGL, forProperty: "UNPACK_PREMULTIPLY_ALPHA_WEBGL");
         gl.setValue(0x9242, forProperty: "CONTEXT_LOST_WEBGL");
         gl.setValue(0x9243, forProperty: "UNPACK_COLORSPACE_CONVERSION_WEBGL");
         gl.setValue(0x9244, forProperty: "BROWSER_DEFAULT_WEBGL");

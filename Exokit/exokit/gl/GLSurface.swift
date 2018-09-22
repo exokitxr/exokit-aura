@@ -7,9 +7,14 @@ import JavaScriptCore
 class GLSurface: GLKViewController {
     var context: EAGLContext?
     fileprivate var _gl: JSValue!
+    fileprivate var _bindings: GLPropertyBindings!
     fileprivate var _onDrawFrame:JSValue?
     fileprivate var _context:JSContext?
     static var glContext: EAGLContext?
+    
+    fileprivate var _flipY = false;
+    fileprivate var _premultiplyAlpha = false;
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,41 +50,9 @@ class GLSurface: GLKViewController {
         let exokit = context.objectForKeyedSubscript("EXOKIT");
         _onDrawFrame = exokit?.objectForKeyedSubscript("onDrawFrame");
         
-        let _ = GLPropertyBindings(gl: _gl);
+        _bindings = GLPropertyBindings(gl: _gl);
         
-        bindBufferData();
         bindFunctions();
-    }
-    
-    fileprivate func bindBufferData() {
-        let ctx = _context?.jsGlobalContextRef;
-        
-        let bufferDataName = JSCUtils.StringToJSString("C_glBufferData");
-        let bufferData = JSObjectMakeFunctionWithCallback(ctx, bufferDataName, { ctx, functionObject, thisObject, argc, argv, exception in
-            let target = JSValueToNumber(ctx, argv![0], nil);
-            let usage = JSValueToNumber(ctx, argv![2], nil);
-            let length = JSObjectGetTypedArrayByteLength(ctx, argv![1], nil);
-            let ptr = JSObjectGetTypedArrayBytesPtr(ctx, argv![1], nil);
-            
-            glBufferData(GLenum(target), length, ptr, GLenum(usage));
-            return JSValueMakeUndefined(ctx)
-        });
-        
-        let bufferSubDataName = JSCUtils.StringToJSString("C_glBufferSubData");
-        let bufferSubData = JSObjectMakeFunctionWithCallback(ctx, bufferSubDataName, { ctx, functionObject, thisObject, argc, argv, exception in
-            let target = JSValueToNumber(ctx, argv![0], nil);
-            let offset = JSValueToNumber(ctx, argv![1], nil);
-            let ptr = JSObjectGetTypedArrayBytesPtr(ctx, argv![2], nil);
-            let size = JSValueToNumber(ctx, argv![3], nil);
-            
-            glBufferSubData(GLenum(target), GLintptr(offset), GLsizeiptr(size), ptr)
-            return JSValueMakeUndefined(ctx)
-        });
-        
-        JSObjectSetProperty(ctx, JSContextGetGlobalObject(ctx), bufferDataName, bufferData, JSPropertyAttributes(kJSPropertyAttributeNone), nil);
-        JSObjectSetProperty(ctx, JSContextGetGlobalObject(ctx), bufferSubDataName, bufferSubData, JSPropertyAttributes(kJSPropertyAttributeNone), nil);
-        JSStringRelease(bufferSubDataName);
-        JSStringRelease(bufferDataName);
     }
     
     func BUFFER_OFFSET(_ i: Int) -> UnsafeRawPointer? {
@@ -87,9 +60,7 @@ class GLSurface: GLKViewController {
     }
     
     fileprivate func bindFunctions() {
-        _getImageDimensions()
         _texImage2DShort()
-        _texImage2DShortArrayBuffer()
         _texImage2DLong()
         _bindBuffer()
         _bindFramebuffer()
@@ -97,6 +68,9 @@ class GLSurface: GLKViewController {
         _bindTexture()
         _uniform1i()
         _pixelStorei()
+        _pixelStoreiBool()
+        bufferData()
+        _bufferSubData()
         viewport()
         activeTexture()
         attachShader()
@@ -227,38 +201,19 @@ class GLSurface: GLKViewController {
         blitFramebuffer()
     }
     
-    fileprivate func _getImageDimensions() {
-        let fn: @convention(block) (String) -> NSArray = { path in
-            if (path.contains("AURA_")) {
-                return [1024, 444];
-            } else {
-                return Utils.getImageDimensions(path: path);
-            }
-        }
-        _gl.setObject(unsafeBitCast(fn, to: AnyObject.self), forKeyedSubscript: "_getImageDimensions" as NSString)
-    }
-    
-    fileprivate func _texImage2DShort() {
-        let fn: @convention(block) (Int, Int, Int, Int, Int, NSDictionary) -> Void = { target, level, intfr, format, type, img in
-            let src =  img["_src"]! as! String
+    fileprivate func _texImage2DResource() {
+        let fn: @convention(block) (String, Int, Int, Int, Int, Int) -> Void = { src, target, level, intfr, format, type in
             if (src.contains("EXOKIT_")) {
                 Exokit.ar?.uploadCameraTexture(src)
             } else if (src.contains("mp4")) {
                 VideoElementBackingList.get(src).texImage2D(target, level, intfr, format, type);
-            } else {
-                let (imageData, image) = Utils.getImageData(path: src);
-                let data = CFDataGetBytePtr(imageData)!
-                let width = UInt((image?.width)!)
-                let height = UInt((image?.height)!)
-                
-                glTexImage2D(GLenum(target), GLint(level), GLint(intfr), GLsizei(width), GLsizei(height), 0, GLenum(format), GLenum(type), data)
             }
         }
-        _gl.setObject(unsafeBitCast(fn, to: AnyObject.self), forKeyedSubscript: "_texImage2DShort" as NSString)
+        _gl.setObject(unsafeBitCast(fn, to: AnyObject.self), forKeyedSubscript: "_texImage2DResource" as NSString)
     }
     
-    fileprivate func _texImage2DShortArrayBuffer() {
-        let fn: @convention(block) (Int, Int, Int, Int, Int, JSValue) -> Void = { target, level, intfr, format, type, arraybuffer in
+    fileprivate func _texImage2DShort() {
+        let fn: @convention(block) (Int, Int, Int, Int, Int, JSValue, NSDictionary) -> Void = { target, level, intfr, format, type, arraybuffer, info in
             if let context = arraybuffer.context {
                 if arraybuffer.isNull || arraybuffer.isUndefined {
                     context.exception =
@@ -272,8 +227,22 @@ class GLSurface: GLKViewController {
                 
                 let ptr = JSObjectGetArrayBufferBytesPtr(context.jsGlobalContextRef, arraybuffer.jsValueRef, nil)
                 let size = JSObjectGetArrayBufferByteLength(context.jsGlobalContextRef, arraybuffer.jsValueRef, nil)
-                let flipped = true
-                let premultiplied = true
+                var flipped = false
+                var premultiplied = false
+                
+                let infoFlipped = info["flipped"] as! String;
+                let infoPremultiply = info["premultiply"] as! String;
+                if (infoFlipped != "-1") {
+                    flipped = infoFlipped == "true" ? true : false;
+                } else {
+                    flipped = self._flipY;
+                }
+                
+                if (infoPremultiply != "-1") {
+                    premultiplied = infoPremultiply == "true" ? true : false;
+                } else {
+                    premultiplied = self._premultiplyAlpha;
+                }
                 
                 if ptr != nil {
                     let (width, height, textureData) = JSCUtils.TextureFromArrayBuffer(ptr!, size, flipped, premultiplied)
@@ -281,7 +250,28 @@ class GLSurface: GLKViewController {
                 }
             }
         }
-        _gl.setObject(unsafeBitCast(fn, to: AnyObject.self), forKeyedSubscript: "_texImage2DShortArrayBuffer" as NSString)
+        _gl.setObject(unsafeBitCast(fn, to: AnyObject.self), forKeyedSubscript: "_texImage2DShort" as NSString)
+    }
+    
+    fileprivate func _texImage2DLong() {
+        let fn: @convention(block) (Int, Int, Int, Int, Int, Int, Int, Int, JSValue) -> Void = { target, level, intfr, width, height, border, format, type, arraybuffer in
+            if let context = arraybuffer.context {
+                if arraybuffer.isNull || arraybuffer.isUndefined {
+                    context.exception =
+                        JSValue(
+                            jsValueRef: JSCUtils.Exception(
+                                context.jsGlobalContextRef,
+                                "Arraybuffer must not be null."),
+                            in: arraybuffer.context)
+                    return
+                }
+                
+                let ptr = JSObjectGetArrayBufferBytesPtr(context.jsGlobalContextRef, arraybuffer.jsValueRef, nil)
+
+                glTexImage2D(GLenum(target), GLint(level), GLint(intfr), GLsizei(width), GLsizei(height), GLint(border), GLenum(format), GLenum(type), ptr)
+            }
+        }
+        _gl.setObject(unsafeBitCast(fn, to: AnyObject.self), forKeyedSubscript: "_texImage2DLong" as NSString)
     }
     
     fileprivate func getBytesPerPixel(type: Int, format: Int) -> Int {
@@ -323,40 +313,53 @@ class GLSurface: GLKViewController {
         }
     }
     
-    fileprivate func _texImage2DLong() {
-        let fn: @convention(block) (Int, Int, Int, Int, Int, Int, Int, Int, NSDictionary) -> Void = { target, level, intfr, width, height, border, format, type, img in
-            
-            if (img["intArray"] != nil) {
-                let array = img["intArray"]! as! [Double];
-                glTexImage2D(GLenum(target), GLint(level), GLint(intfr), GLsizei(width), GLsizei(height), GLint(border), GLenum(format), GLenum(type), array.glIntArray)
-            } else if (img["floatArray"] != nil) {
-                let array = img["floatArray"]! as! [Double];
-                glTexImage2D(GLenum(target), GLint(level), GLint(intfr), GLsizei(width), GLsizei(height), GLint(border), GLenum(format), GLenum(type), array.glFloatArray)
-            } else {
-                
-                let src = img["_src"]! as! String
-                if (src == "-1") {
-                    let nulled = calloc(width * height, self.getBytesPerPixel(type: type, format: format));
-                    glTexImage2D(GLenum(target), GLint(level), GLint(intfr), GLsizei(width), GLsizei(height), GLint(border), GLenum(format), GLenum(type), nulled)
-                    free(nulled)
-                } else {
-                    let (imageData, _) = Utils.getImageData(path: src);
-                    let data = CFDataGetBytePtr(imageData)!
-                    
-                    glTexImage2D(GLenum(target), GLint(level), GLint(intfr), GLsizei(width), GLsizei(height), GLint(border), GLenum(format), GLenum(type), data)
-                }
-                
-            }
-        }
-        _gl.setObject(unsafeBitCast(fn, to: AnyObject.self), forKeyedSubscript: "_texImage2DLong" as NSString)
-    }
-    
     fileprivate func _bindBuffer() {
         let fn: @convention(block) (Int, NSDictionary) -> Void = { target, buffer in
             let id = buffer["_id"] as! Int
             glBindBuffer(GLenum(target), GLuint(id))
         }
         _gl.setObject(unsafeBitCast(fn, to: AnyObject.self), forKeyedSubscript: "_bindBuffer" as NSString)
+    }
+    
+    fileprivate func bufferData() {
+        let fn: @convention(block) (Int, JSValue, Int) -> Void = { target, buffer, usage in
+            if let context = buffer.context {
+                if buffer.isNull || buffer.isUndefined {
+                    context.exception =
+                        JSValue(
+                            jsValueRef: JSCUtils.Exception(
+                                context.jsGlobalContextRef,
+                                "Typed Array must not be null."),
+                            in: buffer.context)
+                    return
+                }
+                
+                let ptr = JSObjectGetTypedArrayBytesPtr(context.jsGlobalContextRef, buffer.jsValueRef, nil)
+                let length = JSObjectGetTypedArrayByteLength(context.jsGlobalContextRef, buffer.jsValueRef, nil)
+                glBufferData(GLenum(target), length, ptr, GLenum(usage))
+            }
+        }
+        _gl.setObject(unsafeBitCast(fn, to: AnyObject.self), forKeyedSubscript: "bufferData" as NSString)
+    }
+    
+    fileprivate func _bufferSubData() {
+        let fn: @convention(block) (Int, Int, JSValue, Int) -> Void = { target, offset, buffer, size in
+            if let context = buffer.context {
+                if buffer.isNull || buffer.isUndefined {
+                    context.exception =
+                        JSValue(
+                            jsValueRef: JSCUtils.Exception(
+                                context.jsGlobalContextRef,
+                                "Typed Array must not be null."),
+                            in: buffer.context)
+                    return
+                }
+                
+                let ptr = JSObjectGetTypedArrayBytesPtr(context.jsGlobalContextRef, buffer.jsValueRef, nil)
+                glBufferSubData(GLenum(target), GLintptr(offset), GLsizeiptr(size), ptr)
+            }
+        }
+        _gl.setObject(unsafeBitCast(fn, to: AnyObject.self), forKeyedSubscript: "_bufferSubData" as NSString)
     }
     
     fileprivate func _bindFramebuffer() {
@@ -395,6 +398,19 @@ class GLSurface: GLKViewController {
             glPixelStorei(GLenum(pname), GLint(param))
         }
         _gl.setObject(unsafeBitCast(fn, to: AnyObject.self), forKeyedSubscript: "_pixelStorei" as NSString)
+    }
+    
+    fileprivate func _pixelStoreiBool() {
+        let fn: @convention(block) (Int, Bool) -> Void = { pname, param in
+            if (pname == self._bindings.UNPACK_PREMULTIPLY_ALPHA_WEBGL) {
+                self._premultiplyAlpha = param;
+            }
+            
+            if (pname == self._bindings.UNPACK_FLIP_Y_WEBGL) {
+                self._flipY = param;
+            }
+        }
+        _gl.setObject(unsafeBitCast(fn, to: AnyObject.self), forKeyedSubscript: "_pixelStoreiBool" as NSString)
     }
     
     fileprivate func viewport() {

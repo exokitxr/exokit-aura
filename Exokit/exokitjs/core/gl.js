@@ -51,34 +51,25 @@ function initialize(_gl) {
 
     _gl.pixelStorei = function(p0, p1) {
         if (typeof p1 === 'number') _gl._pixelStorei(p0, p1);
+        else _gl._pixelStoreiBool(p0, p1);
     }
 
     _gl.texImage2D = function(p0, p1, p2, p3, p4, p5, p6, p7, p8) {
-        // var img;
-        // if (p6) {
-        //     img = p8 || EXOKIT._img;
-        //     if (p8 && p8.buffer) {
-        //         if (p8 instanceof Float32Array) img = {floatArray: p8};
-        //         else img = {intArray: p8};
-        //     }
-        //
-        //     if (img._arraybuffer) {
-        //         _gl._texImage2DLongArrayBuffer(p0, p1, p2, p3, p4, p5, p6, p7, img._arraybuffer);
-        //     } else {
-        //         // _gl._texImage2DLong(p0, p1, p2, p3, p4, p5, p6, p7, img);
-        //     }
-        // } else {
-        //     img = p5 || EXOKIT._img;
-        //     if (!img._src) return;
-        //
-        //     if (img._arraybuffer) {
-                if (p5 && p5._arraybuffer) _gl._texImage2DShortArrayBuffer(p0, p1, p2, p3, p4, p5._arraybuffer);
-            // } else {
-            //     _gl._texImage2DShort(p0, p1, p2, p3, p4, img);
-            // }
-        // }
+        let info = EXOKIT._img;
+        let image = p6 ? p8 : p5;
+        if (image._arraybuffer) {
+            info.flipped = image.flipped;
+            info.premultiply = image.premultiply;
+        }
+
+        if (p6) {
+            _gl._texImage2DLong(p0, p1, p2, p3, p4, p5, p6, p7, p8.buffer);
+        } else {
+            if (!!p5.resource) _gl._texImage2DResource(p5.resource, p0, p1, p2, p3, p4);
+            else if (p5.buffer) _gl._texImage2DShort(p0, p1, p2, p3, p4, p5.buffer, info);
+        }
     };
-    //
+
     _gl.uniform1i = function(location, x) {
         if (typeof x === 'boolean') {
             x = !!x ? 1 : 0;
@@ -145,13 +136,9 @@ function initialize(_gl) {
         }
     }
 
-    _gl.bufferData = function(p0, p1, p2) {
-        window.C_glBufferData(p0, p1, p2);
-    }
-
     _gl.bufferSubData = function(p0, p1, p2, p3) {
         if (!p3) p3 = p2.length;
-        window.C_glBufferSubData(p0, p1, p2, p3);
+        _gl._bufferSubData(p0, p1, p2, p3);
     }
 }
 

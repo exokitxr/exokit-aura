@@ -1,4 +1,9 @@
 class Image {
+    constructor() {
+        this.flipped = '-1';
+        this.premultiply = '-1';
+    }
+
     set src(url) {
         this._src = url;
         if (!url.includes('http')) url = EXOKIT.rootPath + url;
@@ -12,7 +17,7 @@ class Image {
                 _this.width = v.width;
                 _this.height = v.height;
                 _this.onload && _this.onload();
-                _this._arraybuffer = r;
+                _this.buffer = r;
             }
         });
 

@@ -3,14 +3,10 @@ const shaderCode = require('./camera-shaders');
 
 const renderer = new Renderer();
 
-function createImg(type) {
-    return {src: type, _src: type};
-}
-
 class Camera {
     constructor() {
-        this.lum = new Texture(createImg('EXOKIT_LUMINANCE'));
-        this.chroma = new Texture(createImg('EXOKIT_CHROMA'));
+        this.lum = new Texture({resource: 'EXOKIT_LUMINANCE'});
+        this.chroma = new Texture({resource: 'EXOKIT_CHROMA'});
         this.lum.dynamic = this.chroma.dynamic = true;
 
         this.renderer = new Renderer();
