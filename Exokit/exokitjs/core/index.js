@@ -52,3 +52,11 @@ window.requestAnimationFrame = function(callback) {
 //xhr.open('GET', "http://192.168.32.101:8080/a.png");
 //xhr.responseType = 'arraybuffer';
 //xhr.send();
+
+//var ww = new Worker('ibon.js');
+//
+//ww.addEventListener('message', function(e) {
+//    console.log('Worker said: '+ JSON.stringify(e));
+//}, false);
+//
+//ww.postMessage(['Hello World',1,{a:5}]); // Send data to our worker.

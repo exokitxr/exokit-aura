@@ -5,8 +5,8 @@ function Worker(_script) {
     const _events = {};
 
     this.postMessage = function(data, buffer) {
-        let string = JSON.stringify(data);
-        _backing.postMessage(string);
+//        let string = JSON.stringify(data);
+        _backing.postMessage(data);
     }
 
     this.addEventListener = function(evt, callback) {
@@ -17,10 +17,10 @@ function Worker(_script) {
         _backing.terminate();
     }
 
-    _backing.receiveMessage = function(string) {
-        let data = JSON.parse(string);
-        Worker.replaceTransfer(data);
-        Worker.replaceTransfer(data.message);
+    _backing.receiveMessage = function(data) {
+//        let data = JSON.parse(string);
+//        Worker.replaceTransfer(data);
+//        Worker.replaceTransfer(data.message);
         _events.message && _events.message({data});
         Worker.TRANSFERS = {};
     }

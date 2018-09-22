@@ -3,7 +3,7 @@ import JavaScriptCore
 
 @objc protocol WorkerBackingMethod : JSExport {
     func load(_ path:String) -> Void
-    func postMessage(_ string:String) -> Void
+    func postMessage(_ data:JSValue) -> Void
     static func create() -> WorkerBacking
 }
 
@@ -11,7 +11,7 @@ class WorkerBacking : NSObject, WorkerBackingMethod {
     var index = WorkerBackingList.getIndex();
     var jsc:JSCWorker?;
     var _thread = DispatchQueue(label: "exokit.WorkerBacking");
-    var _queue:[String] = [];
+    var _queue:[JSManagedValue] = [];
     
     override init() {
         super.init();
@@ -24,19 +24,18 @@ class WorkerBacking : NSObject, WorkerBackingMethod {
         }
     }
     
-    func postMessage(_ string:String) {
-        _queue.append(string);
+    func postMessage(_ data:JSValue) {
+        let managedData = JSManagedValue(value: data, andOwner: self)
+        _queue.append(managedData!)
     }
     
     func tick() {
-        _thread.async {
+        _thread.sync {
             self.jsc?.tick();
-            
-            if (self.jsc != nil && self._queue.count > 0) {
-                let string = self._queue[0];
-                self._queue.remove(at: 0);
-                self.jsc?.postMessage(string);
+            for managedData in self._queue {
+                self.jsc?.postMessage(managedData.value);
             }
+            self._queue.removeAll()
         }
     }
     
@@ -45,11 +44,11 @@ class WorkerBacking : NSObject, WorkerBackingMethod {
         self.jsc?.terminate();
     }
     
-    func receiveMessage(_ string:String) {
+    func receiveMessage(_ data:JSManagedValue) {
         DispatchQueue.main.async {
             let obj = JSValue.init(object: self, in: JSCEngine.jsContext!)
             let cb = obj?.objectForKeyedSubscript("receiveMessage");
-            let _ = cb?.call(withArguments: [string])
+            let _ = cb?.call(withArguments: [data.value])
         }
     }
     
