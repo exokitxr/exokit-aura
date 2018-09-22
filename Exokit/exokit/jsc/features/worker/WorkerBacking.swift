@@ -46,11 +46,11 @@ class WorkerBacking : NSObject, WorkerBackingMethod {
         self.jsc?.terminate();
     }
     
-    func receiveMessage(_ string:String) {
+    func receiveMessage(_ data:JSManagedValue) {
         DispatchQueue.main.async {
             let obj = JSValue.init(object: self, in: JSCEngine.jsContext!)
             let cb = obj?.objectForKeyedSubscript("receiveMessage");
-            let _ = cb?.call(withArguments: [string])
+            let _ = cb?.call(withArguments: [data.value])
         }
     }
     

@@ -68,8 +68,8 @@ class JSCWorker {
         }
         EXOKIT.setObject(unsafeBitCast(evaluate, to: AnyObject.self), forKeyedSubscript: "evaluate" as NSString)
         
-        let postMessage: @convention(block) (String) -> Void = { msg in
-            self._backing.receiveMessage(msg);
+        let postMessage: @convention(block) (JSValue) -> Void = { msg in
+            self._backing.receiveMessage(JSManagedValue(value: msg));
         }
         EXOKIT.setObject(unsafeBitCast(postMessage, to: AnyObject.self), forKeyedSubscript: "postMessage" as NSString)
         

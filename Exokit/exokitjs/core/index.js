@@ -56,7 +56,7 @@ window.requestAnimationFrame = function(callback) {
 var ww = new Worker('ibon.js');
 
 ww.addEventListener('message', function(e) {
-                        console.log('Worker said: ', JSON.stringify(e));
-                        }, false);
+    console.log('Worker said: '+ JSON.stringify(e));
+}, false);
 
 ww.postMessage(['Hello World',1,{a:5}]); // Send data to our worker.
