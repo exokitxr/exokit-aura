@@ -23,7 +23,7 @@ const _getArrayType = function(array) {
 };
 
 EXOKIT.onMessage = function(message) {
-    self.fireEvent('message', {data: JSON.parse(message)});
+    self.fireEvent('message', {data: message});
 };
 
 self.postMessage = function(msg, buffer) {
@@ -39,7 +39,7 @@ self.postMessage = function(msg, buffer) {
             }
         }
     }
-    EXOKIT.postMessage(JSON.stringify(msg));
+    EXOKIT.postMessage(msg);
 };
 
 self.importScripts = function() {

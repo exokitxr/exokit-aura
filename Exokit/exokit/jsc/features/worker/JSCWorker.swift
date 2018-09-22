@@ -6,17 +6,20 @@ class JSCWorker {
     var EXOKIT:JSValue;
     var _backing:WorkerBacking;
     
+    fileprivate static var index = 0
     fileprivate var requireUtil : Require? = nil
     
     init(_ path:String, backing: WorkerBacking) {
         _backing = backing;
         
-        context = JSContext()
+        context = JSContext(virtualMachine: JSCEngine.vm)
+        context.name = "Worker\(JSCWorker.index)"
+        JSCWorker.index = JSCWorker.index + 1
         context.exceptionHandler = { context, exception in
             if let value = exception {
                 let stacktrace = value.objectForKeyedSubscript("stack").toString()
                 let moreInfo = "stacktrace: \n\(stacktrace ?? "")."
-                print("!!!!! JS Exception \(value)\n\(moreInfo)")
+                print("!!!!! Worker JS Exception \(value)\n\(moreInfo)")
             }
         }
         
@@ -78,9 +81,9 @@ class JSCWorker {
         EXOKIT.setObject(unsafeBitCast(transferData, to: AnyObject.self), forKeyedSubscript: "transferData" as NSString)
     }
     
-    func postMessage(_ string:String) {
+    func postMessage(_ data:JSValue) {
         let cb = EXOKIT.objectForKeyedSubscript("onMessage");
-        let _ = cb?.call(withArguments: [string])
+        let _ = cb?.call(withArguments: [data])
     }
     
     func tick() {

@@ -7,15 +7,20 @@ class JSCEngine {
     var browser:JSValue!;
     
     static var jsContext:JSContext!
-    static var active = false;
-    static var inst:JSCEngine!;
+    static var active = false
+    static var inst:JSCEngine!
+    static var vm: JSVirtualMachine!
     
     fileprivate var _initTime = DispatchTime.now().uptimeNanoseconds;
     
     fileprivate var requireUtil : Require? = nil
     
     init() {
-        context = JSContext()
+        
+        JSCEngine.vm = JSVirtualMachine()
+        
+        context = JSContext(virtualMachine: JSCEngine.vm)
+        context.name = "Main"
         context.exceptionHandler = { context, exception in
             if let value = exception {
                 let stacktrace = value.objectForKeyedSubscript("stack").toString()
