@@ -26,19 +26,7 @@ EXOKIT.onMessage = function(message) {
     self.fireEvent('message', {data: message});
 };
 
-self.postMessage = function(msg, buffer) {
-    if (buffer) {
-        for (let key in msg) {
-            if (ArrayBuffer.isView(msg[key])) {
-                let typedArray = msg[key];
-                let type = _getArrayType(typedArray);
-                let id = (Date.now() + Math.round(Math.random() * 5000)).toString();
-                let typedKey = `t_${type}/${key}/${id}`;
-                msg[key] = typedKey;
-                EXOKIT.transferData(typedKey, typedArray);
-            }
-        }
-    }
+self.postMessage = function(msg) {
     EXOKIT.postMessage(msg);
 };
 

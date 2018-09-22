@@ -30,14 +30,12 @@ class WorkerBacking : NSObject, WorkerBackingMethod {
     }
     
     func tick() {
-        _thread.async {
+        _thread.sync {
             self.jsc?.tick();
-            
-            if (self.jsc != nil && self._queue.count > 0) {
-                let managedData = self._queue[0];
-                self._queue.remove(at: 0);
+            for managedData in self._queue {
                 self.jsc?.postMessage(managedData.value);
             }
+            self._queue.removeAll()
         }
     }
     
